@@ -1,0 +1,31 @@
+# Apache 2.4 site for Ubuntu Server 24.04 (apache2 package).
+#
+# ON SILVERSTONE (run with sudo):
+#   1. Mount data disk and create DocumentRoot, e.g.:
+#        sudo mkdir -p /srv/www/homelab-docs
+#   2. Copy this file (edit ServerName first):
+#        sudo cp apache2-homelab-docs.conf.example /etc/apache2/sites-available/homelab-docs.conf
+#   3. Enable site, test, reload:
+#        sudo a2ensite homelab-docs.conf
+#        sudo apache2ctl configtest
+#        sudo systemctl reload apache2
+#   4. HTTPS: use a public DNS name (not raw LAN IP). Example:
+#        sudo apt install certbot python3-certbot-apache
+#        sudo certbot --apache -d homelab.example.com
+#
+# Default below: Silverstone LAN http://192.168.1.200/ — change ServerName if you use a hostname.
+
+<VirtualHost *:80>
+    ServerName 192.168.1.200
+    ServerAdmin webmaster@localhost
+    DocumentRoot /srv/www/homelab-docs
+
+    <Directory /srv/www/homelab-docs>
+        Options FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/homelab-docs-error.log
+    CustomLog ${APACHE_LOG_DIR}/homelab-docs-access.log combined
+</VirtualHost>

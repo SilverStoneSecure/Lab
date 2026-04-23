@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Service icon placeholder">
+  <rect width="512" height="512" rx="96" fill="#131926"/>
+  <rect x="98" y="98" width="316" height="316" rx="54" fill="#7aa2f7" fill-opacity="0.22" stroke="#7aa2f7" stroke-width="18"/>
+  <circle cx="256" cy="256" r="76" fill="none" stroke="#d7e3ff" stroke-width="20"/>
+  <circle cx="256" cy="256" r="24" fill="#d7e3ff"/>
+  <text x="120" y="448" fill="#d7e3ff" font-family="Arial, sans-serif" font-size="38">SERVICE</text>
+</svg>
