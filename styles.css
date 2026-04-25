@@ -251,6 +251,19 @@ h2::after {
   background: linear-gradient(90deg, var(--border), transparent);
 }
 
+#media h3 {
+  margin: 1.25rem 0 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#media h2 + h3 {
+  margin-top: 0.35rem;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -469,6 +482,23 @@ footer {
   font-size: 0.85rem;
   color: var(--muted);
   text-align: center;
+}
+
+footer .footer-line {
+  margin: 0.35rem 0 0;
+}
+
+footer .footer-line:first-child {
+  margin-top: 0;
+}
+
+footer a {
+  color: var(--external);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 520px) {

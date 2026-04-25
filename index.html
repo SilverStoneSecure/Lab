@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Homelab dashboard — services, docs, and quick links." />
-    <title>SilverStoneHomelab</title>
+    <meta
+      name="description"
+      content="SilverStone homelab — one-page dashboard: LAN and WAN links, device inventory, media, and notes."
+    />
+    <title>SilverStoneLab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -28,7 +31,7 @@
         </div>
         <div class="status" role="status">
           <p class="status-wan"><strong>WAN:</strong> 50.99.15.26</p>
-          <p class="status-host"><strong>Silverstone (open)</strong></p>
+          <p class="status-host"><strong>SilverStone (open)</strong></p>
           <ul class="status-list">
             <li>Minecraft — TCP/UDP 25565 <span class="status-note">(WAN forwarded)</span></li>
             <li>Nextcloud — TCP 80</li>
@@ -39,16 +42,18 @@
 
       <nav class="quick-nav" aria-label="Site navigation">
         <a href="./index.html">Home</a>
-        <a href="./previous-links.html">Previous links</a>
         <a href="#internal">LAN links</a>
         <a href="#inventory">Inventory</a>
         <a href="#external">WAN links</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#media">Media</a>
         <div class="dropdown">
           <button class="dropbtn" aria-haspopup="true">Categories</button>
           <div class="dropdown-content">
-            <a href="./contact.html">Contact</a>
-            <a href="./about.html">About</a>
-            <a href="./media.html">Media</a>
+            <a href="#contact">Contact</a>
+            <a href="#about">About</a>
+            <a href="#media">Media</a>
             <a href="./images/backgrounds/">Images / Backgrounds</a>
             <a href="./images/icons/">Images / Icons</a>
           </div>
@@ -58,15 +63,13 @@
       <section id="internal" aria-labelledby="internal-heading">
         <h2 id="internal-heading">On the LAN</h2>
         <div class="cards">
-          
-          
           <a class="card" href="http://192.168.1.200/">
-            <span class="card-title">Silverstone · Nextcloud <span class="tag lan">LAN</span></span>
+            <span class="card-title">SilverStone · Nextcloud <span class="tag lan">LAN</span></span>
             <p class="card-desc">Ethernet host (confirmed). Nextcloud on TCP 80.</p>
             <span class="card-url">http://192.168.1.200/</span>
           </a>
           <a class="card" href="http://192.168.1.200:8080/">
-            <span class="card-title">Silverstone · Apache2 <span class="tag lan">LAN</span></span>
+            <span class="card-title">SilverStone · Apache2 <span class="tag lan">LAN</span></span>
             <p class="card-desc">Apache2 on TCP 8080 (same machine as Nextcloud).</p>
             <span class="card-url">http://192.168.1.200:8080/</span>
           </a>
@@ -122,7 +125,7 @@
                 <td>Not assigned. <span class="pill q">JJ confirmed · verify</span></td>
               </tr>
               <tr>
-                <td>Silverstone</td>
+                <td>SilverStone</td>
                 <td>Ethernet</td>
                 <td class="mono">fc:9d:05:02:21:96</td>
                 <td class="mono ip">192.168.1.200</td>
@@ -131,7 +134,7 @@
                 </td>
               </tr>
               <tr>
-                <td>Silverstone</td>
+                <td>SilverStone</td>
                 <td>Wi‑Fi</td>
                 <td class="mono">48:45:e6:29:18:93</td>
                 <td class="mono muted">—</td>
@@ -187,10 +190,15 @@
             <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
             <span class="card-url">50.99.15.26:XXX</span>
           </a>
-          <a class="card external" href="minecraft://50.99.15.26:25565">
-            <span class="card-title">GITHUB<span class="tag wan">WAN</span></span>
-            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
-            <span class="card-url">50.99.15.26:XXX</span>
+          <a
+            class="card external"
+            href="https://github.com/SilverStone/Lab"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="card-title">GitHub · Lab repo <span class="tag wan">WAN</span></span>
+            <p class="card-desc">Source and history for this static homelab dashboard.</p>
+            <span class="card-url">github.com/SilverStone/Lab</span>
           </a>
           <a class="card external" href="minecraft://50.99.15.26:25565">
             <span class="card-title">GITLAB<span class="tag wan">WAN</span></span>
@@ -210,7 +218,7 @@
           <a class="card external" href="http://50.99.15.26/">
             <span class="card-title">NEXTCLOUD<span class="tag wan">WAN</span></span>
             <p class="card-desc">
-              Silverstone serves Nextcloud on TCP 80 (LAN <code>192.168.1.200:80</code>). Update this
+              SilverStone serves Nextcloud on TCP 80 (LAN <code>192.168.1.200:80</code>). Update this
               card if WAN forwarding differs.
             </p>
             <span class="card-url">50.99.15.26:80 (HTTP)</span>
@@ -231,6 +239,87 @@
         </div>
       </section>
 
+      <section id="about" aria-labelledby="about-heading">
+        <h2 id="about-heading">About</h2>
+        <div class="note">
+          <p style="margin: 0 0 0.7rem">
+            This site is a central entry point for your internal and external homelab services.
+          </p>
+          <p style="margin: 0">
+            Keep sensitive details LAN-only when possible, and prefer VPN access over exposed ports.
+          </p>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Admin contacts</h2>
+        <div class="cards">
+          <div class="card">
+            <span class="card-title">Primary admin</span>
+            <p class="card-desc">Name: add your name here</p>
+            <span class="card-url">email@example.com</span>
+          </div>
+          <div class="card">
+            <span class="card-title">Backup admin</span>
+            <p class="card-desc">Name: add backup contact</p>
+            <span class="card-url">backup@example.com</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="media" aria-labelledby="media-heading">
+        <h2 id="media-heading">Media</h2>
+        <h3>Folders</h3>
+        <div class="cards">
+          <a class="card" href="./images/backgrounds/">
+            <span class="card-title">Backgrounds <span class="tag lan">Folder</span></span>
+            <p class="card-desc">Desktop wallpapers and rotating background sets.</p>
+            <span class="card-url">./images/backgrounds/</span>
+          </a>
+          <a class="card" href="./images/icons/">
+            <span class="card-title">Icons <span class="tag lan">Folder</span></span>
+            <p class="card-desc">Buff icon pack and service icon assets.</p>
+            <span class="card-url">./images/icons/</span>
+          </a>
+        </div>
+        <h3>Background gallery</h3>
+        <div class="page-grid">
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-aurora.svg"
+              alt="Aurora background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Aurora set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-aurora.svg</p>
+            </div>
+          </a>
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-mountain.svg"
+              alt="Mountain background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Mountain set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-mountain.svg</p>
+            </div>
+          </a>
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-grid.svg"
+              alt="Grid background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Grid set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-grid.svg</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
       <section id="info" aria-labelledby="info-heading">
         <h2 id="info-heading">Notes</h2>
         <div class="note">
@@ -248,7 +337,16 @@
       </section>
 
       <footer>
-        Homelab landing v1.1 — static HTML. Last updated: 2026-04-18
+        <p class="footer-line">
+          SilverStone Homelab v1.1 — static HTML. Last updated: 2026-04-18
+        </p>
+        <p class="footer-line">
+          <a
+            href="https://github.com/SilverStone/Lab"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub · SilverStone/Lab</a>
+        </p>
       </footer>
     </div>
   </body>

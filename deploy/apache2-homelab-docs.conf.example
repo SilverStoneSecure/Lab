@@ -13,7 +13,7 @@
 #        sudo apt install certbot python3-certbot-apache
 #        sudo certbot --apache -d homelab.example.com
 #
-# Default below: Silverstone LAN http://192.168.1.200/ — change ServerName if you use a hostname.
+# Default below: SilverStone LAN http://192.168.1.200/ — change ServerName if you use a hostname.
 
 <VirtualHost *:80>
     ServerName 192.168.1.200

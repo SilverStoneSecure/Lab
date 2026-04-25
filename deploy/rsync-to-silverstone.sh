@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Rsync this static site to Silverstone (LAN 192.168.1.200) or override DEPLOY_HOST.
+# Rsync this static site to SilverStone (LAN 192.168.1.200) or override DEPLOY_HOST.
 #
 # Usage:
 #   export DEPLOY_USER=chad
 #   ./deploy/rsync-to-silverstone.sh
 #
 # Optional overrides:
-#   export DEPLOY_HOST=192.168.1.200   # default: Silverstone
+#   export DEPLOY_HOST=192.168.1.200   # default: SilverStone
 #   export DEPLOY_PATH=/srv/www/homelab-docs
 #
 # Requires: rsync, SSH key or password auth to the remote user.
