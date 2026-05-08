@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Aurora wallpaper placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08111f"/>
+      <stop offset="100%" stop-color="#111a2a"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="30%" cy="20%" r="50%">
+      <stop offset="0%" stop-color="#67ffd8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#67ffd8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="70%" cy="35%" r="45%">
+      <stop offset="0%" stop-color="#5ea0ff" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#5ea0ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#glow1)"/>
+  <rect width="1920" height="1080" fill="url(#glow2)"/>
+  <text x="80" y="980" fill="#d8e4ff" font-family="Arial, sans-serif" font-size="54">Aurora Placeholder</text>
+</svg>

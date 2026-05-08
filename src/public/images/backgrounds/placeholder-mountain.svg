@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Mountain wallpaper placeholder">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2740"/>
+      <stop offset="100%" stop-color="#0a101b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <polygon points="0,900 400,500 800,900" fill="#1d2b43"/>
+  <polygon points="500,900 980,350 1460,900" fill="#243754"/>
+  <polygon points="1200,900 1560,420 1920,900" fill="#2a3f60"/>
+  <circle cx="1580" cy="220" r="90" fill="#d8e6ff" fill-opacity="0.8"/>
+  <text x="80" y="980" fill="#d8e4ff" font-family="Arial, sans-serif" font-size="54">Mountain Placeholder</text>
+</svg>
