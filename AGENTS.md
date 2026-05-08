@@ -86,3 +86,34 @@ After substantive changes:
 04. Log in as admin; confirm guest vs admin behavior and a representative admin POST.
 
 For Docker: `docker compose up --build`, then check logs and healthcheck in `docker-compose.yml`.
+
+## GitHub sync and migration checklist
+
+When preparing to delete a local clone and recreate the repo elsewhere, confirm remote state explicitly:
+
+1. Check local branch and remote tracking:
+   - `git status -sb`
+   - `git branch -vv`
+2. Confirm remotes:
+   - `git remote -v`
+3. Inspect remote branch heads:
+   - `git ls-remote --heads origin`
+4. Push current work:
+   - `git push -u origin master`
+
+If GitHub looks stale, verify which default branch UI is showing (`main` vs `master`). A successful push to `master` does not update `main` automatically.
+
+If `main` must match `master`:
+
+- First attempt non-destructive update:
+  - `git push origin master:main`
+- If rejected because histories diverged, fetch and inspect:
+  - `git fetch origin`
+  - `git log --oneline --left-right --graph origin/main...master`
+- Only with explicit user approval, force-update `main`:
+  - `git push --force-with-lease origin master:main`
+
+Final verification before deleting local files:
+
+- `git ls-remote --heads origin` shows expected commit at `refs/heads/main` (and/or `refs/heads/master`)
+- Open GitHub and confirm latest commit hash/time on the intended default branch.
