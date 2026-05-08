@@ -36,6 +36,10 @@ Ensure latest local commits are present on the intended GitHub branch (`main` or
 6. Final verification:
    - `git ls-remote --heads origin`
    - Confirm expected commit hash exists on target branch.
+   - Final reply ends with a link block that includes:
+     - local workspace path
+     - GitHub repository URL
+     - local HTTP URL `http://localhost:3000`
 
 ## Safety Rules
 - Never force-push without explicit user approval.

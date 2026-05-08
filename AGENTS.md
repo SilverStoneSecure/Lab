@@ -80,7 +80,7 @@ See **`.env.example`** for the canonical list. Important for agents:
 
 After substantive changes:
 
-01. When you report changes to the user, include a link (workspace path or URL) so they can open the edited files or run the app locally — **put that link block last** in your reply so it sits at the bottom of the chat window.
+01. When you report completed work, include a link block as the final part of your reply so it sits at the bottom of the chat window. Include the local workspace path, the GitHub repository URL when available, and the local HTTP testing URL `http://localhost:3000`.
 02. `npm run migrate` (if schema/scripts touched).
 03. `npm run dev` and load `http://localhost:<PORT>/`.
 04. Log in as admin; confirm guest vs admin behavior and a representative admin POST.
