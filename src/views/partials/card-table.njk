@@ -1,0 +1,232 @@
+{% macro tag_options(selected, site) %}
+<option value="lan" {% if selected == 'lan' %}selected{% endif %}>{{ site.tag_lan }}</option>
+<option value="wan" {% if selected == 'wan' %}selected{% endif %}>{{ site.tag_wan }}</option>
+<option value="service" {% if selected == 'service' %}selected{% endif %}>{{ site.tag_service }}</option>
+<option value="device" {% if selected == 'device' %}selected{% endif %}>{{ site.tag_device }}</option>
+<option value="folder" {% if selected == 'folder' %}selected{% endif %}>{{ site.tag_folder }}</option>
+<option value="template" {% if selected == 'template' %}selected{% endif %}>{{ site.tag_template }}</option>
+{% endmacro %}
+
+{% macro section_options(selected, all_card_containers) %}
+{% for container in (all_card_containers or []) %}
+<option value="{{ container.section_key }}" {% if selected == container.section_key %}selected{% endif %}>{{ container.title }}</option>
+{% endfor %}
+{% endmacro %}
+
+{# Admin: each table cell links open the inline editor for that row. #}
+{% macro admin_open_card_edit(card_id) -%}
+<a href="#card-{{ card_id }}" class="title-edit-link" @click.prevent="openCardEditor('', '{{ card_id }}')">{{ caller() }}</a>
+{%- endmacro %}
+{% macro admin_open_inv_edit(row_id) -%}
+<a href="#inv-{{ row_id }}" class="title-edit-link" @click.prevent="invOpenId = (String(invOpenId) === '{{ row_id }}' ? null : '{{ row_id }}')">{{ caller() }}</a>
+{%- endmacro %}
+
+{# Shared grid for table card edit, new card, and gallery card forms. Pass url_default / image_default for new rows only (e.g. gallery). #}
+{% macro card_form_fields(card, is_new, tag_selected, url_default, image_default, site, current_section, all_card_containers) %}
+  <div class="card-edit-grid">
+    {% if is_new %}
+    <p class="card-edit-field card-edit-field-container">
+      <label class="card-edit-label">Container<br /><select name="section">{{ section_options(current_section, all_card_containers) }}</select></label>
+    </p>
+    <p class="card-edit-field card-edit-field-tag">
+      <label class="card-edit-label">{{ site.card_label_tag }}<br /><select name="tag">{{ tag_options(tag_selected, site) }}</select></label>
+    </p>
+    <p class="card-edit-field card-edit-field-title">
+      <label class="card-edit-label">{{ site.card_label_title }}<br /><input type="text" name="title" required placeholder="{{ site.card_placeholder_title }}" autocomplete="off" /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-desc">
+      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="4" placeholder="{{ site.card_placeholder_description }}"></textarea></label>
+    </p>
+    <p class="card-edit-field card-edit-field-url">
+      <label class="card-edit-label">{{ site.card_label_url }}<br /><input type="text" name="url" value="{% if url_default %}{{ url_default }}{% else %}#{% endif %}" /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-newtab">
+      <label class="card-newtab-line"><input type="checkbox" name="open_new_tab" value="1" /> <span>{{ site.card_label_open_new_tab }}</span></label>
+    </p>
+    <p class="card-edit-field card-edit-field-image">
+      <label class="card-edit-label">{{ site.card_label_image_url }}<br /><input type="text" name="image_url" value="{{ image_default }}" placeholder="{{ site.card_placeholder_image_url }}" /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-sort">
+      <label class="card-edit-label">Sort order<br /><input type="number" name="sort_order" placeholder="Auto" /></label>
+    </p>
+    {% else %}
+    <p class="card-edit-field card-edit-field-container">
+      <label class="card-edit-label">Container<br /><select name="section">{{ section_options(card.section, all_card_containers) }}</select></label>
+    </p>
+    <p class="card-edit-field card-edit-field-tag">
+      <label class="card-edit-label">{{ site.card_label_tag }}<br /><select name="tag">{{ tag_options(card.tag, site) }}</select></label>
+    </p>
+    <p class="card-edit-field card-edit-field-title">
+      <label class="card-edit-label">{{ site.card_label_title }}<br /><input type="text" name="title" value="{{ card.title }}" required /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-desc">
+      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="4">{{ card.description }}</textarea></label>
+    </p>
+    <p class="card-edit-field card-edit-field-url">
+      <label class="card-edit-label">{{ site.card_label_url }}<br /><input type="text" name="url" value="{{ card.url }}" /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-newtab">
+      <label class="card-newtab-line"><input type="checkbox" name="open_new_tab" value="1" {% if card.open_new_tab %}checked{% endif %} /> <span>{{ site.card_label_open_new_tab }}</span></label>
+    </p>
+    <p class="card-edit-field card-edit-field-image">
+      <label class="card-edit-label">{{ site.card_label_image_url }}<br /><input type="text" name="image_url" value="{{ card.image_url }}" /></label>
+    </p>
+    <p class="card-edit-field card-edit-field-sort">
+      <label class="card-edit-label">Sort order<br /><input type="number" name="sort_order" value="{{ card.sort_order }}" /></label>
+    </p>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# layout: tiles | rail | gallery. Optional new-card defaults for gallery-style sections. #}
+{% macro card_table(dom_id, heading_text, cards, section_key, session, table_modifier, default_new_tag, wrapper, heading_tag, site, all_card_containers, layout, new_card_url_default, new_card_image_default) %}
+{% set layout = layout or 'tiles' %}
+{% set new_card_url_default = new_card_url_default or '' %}
+{% set new_card_image_default = new_card_image_default or '' %}
+{% set wrap = wrapper or 'section' %}
+{% set htag = heading_tag or 'h2' %}
+{% set has_containers = (all_card_containers and all_card_containers.length > 0) %}
+{% if wrap == 'section' %}
+<section id="{{ dom_id }}" aria-labelledby="{{ dom_id }}-heading">
+{% else %}
+<div id="{{ dom_id }}">
+{% endif %}
+  {% if htag == 'h3' %}
+  <h3 id="{{ dom_id }}-heading">{{ heading_text }}</h3>
+  {% else %}
+  <h2 id="{{ dom_id }}-heading">{{ heading_text }}</h2>
+  {% endif %}
+  {% if layout == 'gallery' %}
+  <div class="page-grid">
+    {% for card in cards %}
+      {% if session and session.role == "admin" %}
+      <div id="card-{{ card.id }}" class="gallery-item gallery-item--admin">
+        <img class="gallery-thumb" src="{{ card.image_url }}" alt="{{ card.title }}" />
+        <div class="gallery-meta">
+          <p class="gallery-title">{{ card.title }}</p>
+          <p class="gallery-subtitle">{{ card.description | e | truncate(160) }}</p>
+          <p class="card-tile-footer">
+            <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
+          </p>
+        </div>
+      </div>
+      {% else %}
+      <a class="gallery-item" href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>
+        <img class="gallery-thumb" src="{{ card.image_url }}" alt="{{ card.title }}" />
+        <div class="gallery-meta">
+          <p class="gallery-title">{{ card.title }}</p>
+          <p class="gallery-subtitle">{{ card.description | e | truncate(160) }}</p>
+        </div>
+      </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% elif layout == 'rail' %}
+  <div class="internal-strip-shell">
+    <p class="internal-strip-nav" aria-label="Horizontal card row navigation">
+      <button type="button" class="action-btn action-btn--rail" @click.prevent="scrollCardRail($event, -1)" aria-label="Scroll cards left">←</button>
+      <button type="button" class="action-btn action-btn--rail" @click.prevent="scrollCardRail($event, 1)" aria-label="Scroll cards right">→</button>
+    </p>
+    <div class="card-tile-grid{% if table_modifier %} {{ table_modifier }}{% endif %}">
+      {% for card in cards %}
+      <article id="card-{{ card.id }}" class="card-tile">
+        <p class="card-tile-top">
+          {% if session and session.role == "admin" %}
+          <a href="#card-{{ card.id }}" class="card-tile-title title-edit-link" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ card.title }}</a>
+          {% else %}
+          <a href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} class="card-tile-title">{{ card.title }}</a>
+          {% endif %}
+          <span class="tag {{ card.tag }}">{{ card.tag | upper }}</span>
+        </p>
+        <p class="card-desc">{{ card.description | e | truncate(180) }}</p>
+        <p class="mono card-url">{{ card.url }}</p>
+        {% if session and session.role == "admin" %}
+        <p class="card-tile-footer">
+          <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
+        </p>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card-tile-grid{% if table_modifier %} {{ table_modifier }}{% endif %}">
+    {% for card in cards %}
+    <article id="card-{{ card.id }}" class="card-tile">
+      <p class="card-tile-top">
+        {% if session and session.role == "admin" %}
+        <a href="#card-{{ card.id }}" class="card-tile-title title-edit-link" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ card.title }}</a>
+        {% else %}
+        <a href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} class="card-tile-title">{{ card.title }}</a>
+        {% endif %}
+        <span class="tag {{ card.tag }}">{{ card.tag | upper }}</span>
+      </p>
+      <p class="card-desc">{{ card.description | e | truncate(180) }}</p>
+      <p class="mono card-url">{{ card.url }}</p>
+      {% if session and session.role == "admin" %}
+      <p class="card-tile-footer">
+        <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
+      </p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if session and session.role == "admin" %}
+  {% for card in cards %}
+  <div
+    class="card-modal-backdrop"
+    x-show="isCardEditorOpen('{{ section_key }}', '{{ card.id }}')"
+    style="display:none;"
+    @keydown.escape.window="closeCardEditors()"
+    @click.self="closeCardEditors()"
+  >
+    <div class="card-modal">
+      <form method="post" action="/admin/cards/{{ card.id }}" class="card-inline-form">
+        <p class="card-modal-close-wrap">
+          <button type="button" class="action-btn action-btn--cancel card-modal-close" aria-label="Close card editor" @click.prevent="closeCardEditors()">X</button>
+        </p>
+        {{ card_form_fields(card, false, '', '', '', site, card.section, all_card_containers) }}
+        <p class="card-edit-toolbar card-edit-toolbar--split">
+          <span class="card-edit-left">
+            <button type="submit" class="action-btn action-btn--save">{{ site.card_action_save }}</button>
+            <button type="button" class="action-btn action-btn--cancel" @click.prevent="closeCardEditors()">{{ site.card_action_cancel }}</button>
+          </span>
+          <button type="submit" formaction="/admin/cards/{{ card.id }}/delete" formmethod="post" class="action-btn action-btn--delete" onclick="return confirm('{{ site.card_confirm_delete }}');">{{ site.card_action_delete }}</button>
+        </p>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% if session and session.role == "admin" %}
+  {% if has_containers %}
+  <div class="card-new-wrap" x-show="isNewCardOpen('{{ section_key }}')" style="display:none;">
+    <form method="post" action="/admin/cards" class="card-inline-form">
+      {{ card_form_fields(null, true, default_new_tag, new_card_url_default, new_card_image_default, site, section_key, all_card_containers) }}
+      <p class="card-edit-toolbar">
+        {% if layout == 'gallery' %}
+        <button type="submit" class="action-btn action-btn--save">{{ site.media_action_save_gallery_card }}</button>
+        {% else %}
+        <button type="submit" class="action-btn action-btn--save">{{ site.card_action_save_new }}</button>
+        {% endif %}
+        <button type="button" class="action-btn action-btn--cancel" @click.prevent="closeCardEditors()">{{ site.card_action_cancel }}</button>
+      </p>
+    </form>
+  </div>
+  <p class="card-table-footer">
+    <button type="button" class="action-btn action-btn--add" @click.prevent="openNewCard('{{ section_key }}')">{{ site.card_action_add }}</button>
+  </p>
+  {% else %}
+  <p class="card-table-footer">
+    <button type="button" class="action-btn action-btn--add" disabled title="Create a card container first">{{ site.card_action_add }}</button>
+  </p>
+  <p class="page-admin-lead">No card containers are configured. Add one in Card containers at the bottom of the page (admin) before creating cards.</p>
+  {% endif %}
+  {% endif %}
+{% if wrap == 'section' %}
+</section>
+{% else %}
+</div>
+{% endif %}
+{% endmacro %}

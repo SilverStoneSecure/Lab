@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="SilverStone homelab — one-page dashboard: LAN and WAN links, device inventory, media, and notes."
+    />
+    <title>SilverStoneLab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <span class="brand-badge">Homelab v1.1</span>
+          <h1>SilverStone LAN Homelab - One Page</h1>
+          <p class="subtitle">
+            Quick links and a living inventory for <code>192.168.1.0/24</code>.
+          </p>
+        </div>
+        <div class="status" role="status">
+          <p class="status-wan"><strong>WAN:</strong> 50.99.15.26</p>
+          <p class="status-host"><strong>SilverStone (open)</strong></p>
+          <ul class="status-list">
+            <li>Minecraft — TCP/UDP 25565 <span class="status-note">(WAN forwarded)</span></li>
+            <li>Nextcloud — TCP 80</li>
+            <li>Apache2 — TCP 8080</li>
+          </ul>
+        </div>
+      </header>
+
+      <nav class="quick-nav" aria-label="Site navigation">
+        <a href="./index.html">Home</a>
+        <a href="#internal">LAN links</a>
+        <a href="#inventory">Inventory</a>
+        <a href="#external">WAN links</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#media">Media</a>
+        <div class="dropdown">
+          <button class="dropbtn" aria-haspopup="true">Categories</button>
+          <div class="dropdown-content">
+            <a href="#contact">Contact</a>
+            <a href="#about">About</a>
+            <a href="#media">Media</a>
+            <a href="./images/backgrounds/">Images / Backgrounds</a>
+            <a href="./images/icons/">Images / Icons</a>
+          </div>
+        </div>
+      </nav>
+
+      <section id="internal" aria-labelledby="internal-heading">
+        <h2 id="internal-heading">On the LAN</h2>
+        <div class="cards">
+          <a class="card" href="http://192.168.1.200/">
+            <span class="card-title">SilverStone · Nextcloud <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Ethernet host (confirmed). Nextcloud on TCP 80.</p>
+            <span class="card-url">http://192.168.1.200/</span>
+          </a>
+          <a class="card" href="http://192.168.1.200:8080/">
+            <span class="card-title">SilverStone · Apache2 <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Apache2 on TCP 8080 (same machine as Nextcloud).</p>
+            <span class="card-url">http://192.168.1.200:8080/</span>
+          </a>
+          <a class="card" href="http://192.168.1.120/">
+            <span class="card-title">T420  <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Wi‑Fi address (confirmed).</p>
+            <span class="card-url">http://192.168.1.120/</span>
+          </a>
+          <a class="card" href="http://192.168.1.100/">
+            <span class="card-title">JJNitro <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Ethernet host (confirmed).</p>
+            <span class="card-url">http://192.168.1.100/</span>
+          </a>
+          <a class="card" href="http://192.168.1.6/">
+            <span class="card-title">Wi‑Fi admin <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Access point or wifi/mesh/IP controller UI.</p>
+            <span class="card-url">http://192.168.1.6/</span>
+          </a>
+          <a class="card" href="http://192.168.1.254/">
+            <span class="card-title">Modem admin <span class="tag lan">LAN</span></span>
+            <p class="card-desc">Modem web interface inc. port forwarding (HTTPS if HTTP fails).</p>
+            <span class="card-url">http://192.168.1.254/</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="inventory" aria-labelledby="inventory-heading">
+        <h2 id="inventory-heading">Device inventory</h2>
+        <div class="table-wrap">
+          <table class="inv">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>Link</th>
+                <th>MAC</th>
+                <th>IPv4</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>JJNitro</td>
+                <td>Ethernet</td>
+                <td class="mono">30:43:d7:e6:7c:a9</td>
+                <td class="mono ip">192.168.1.100</td>
+                <td><span class="pill ok">confirmed</span></td>
+              </tr>
+              <tr>
+                <td>JJNitro</td>
+                <td>Wi‑Fi</td>
+                <td class="mono">58:02:05:cc:1a:a9</td>
+                <td class="mono muted">—</td>
+                <td>Not assigned. <span class="pill q">JJ confirmed · verify</span></td>
+              </tr>
+              <tr>
+                <td>SilverStone</td>
+                <td>Ethernet</td>
+                <td class="mono">fc:9d:05:02:21:96</td>
+                <td class="mono ip">192.168.1.200</td>
+                <td>
+                  <span class="pill ok">confirmed</span> · Nextcloud TCP 80 · Apache2 TCP 8080
+                </td>
+              </tr>
+              <tr>
+                <td>SilverStone</td>
+                <td>Wi‑Fi</td>
+                <td class="mono">48:45:e6:29:18:93</td>
+                <td class="mono muted">—</td>
+                <td>Not assigned</td>
+              </tr>
+              <tr>
+                <td>T420 (Pop!_OS)</td>
+                <td>Ethernet</td>
+                <td class="mono">12:aa:bb:16:c9:ee</td>
+                <td class="mono muted">—</td>
+                <td>Not assigned</td>
+              </tr>
+              <tr>
+                <td>T420 (Pop!_OS)</td>
+                <td>Wi‑Fi</td>
+                <td class="mono">10:0b:a9:87:2d:2c</td>
+                <td class="mono ip">192.168.1.120</td>
+                <td><span class="pill ok">confirmed</span></td>
+              </tr>
+              <tr>
+                <td>Supaporn’s Z Flip 7</td>
+                <td>Wi‑Fi</td>
+                <td class="mono">56:0c:b6:80:3a:1e</td>
+                <td class="mono muted">—</td>
+                <td>Not assigned</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="external" aria-labelledby="external-heading">
+        <h2 id="external-heading">From the internet</h2>
+        <div class="cards">
+      
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">Minecraft <span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port 25565 forwarded to your server (TCP/UDP). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:25565</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">PLEX<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">DOCUWIKI<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">LAMP<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a
+            class="card external"
+            href="https://github.com/SilverStone/Lab"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="card-title">GitHub · Lab repo <span class="tag wan">WAN</span></span>
+            <p class="card-desc">Source and history for this static homelab dashboard.</p>
+            <span class="card-url">github.com/SilverStone/Lab</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">GITLAB<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">MEAN<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">TORRENTING<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="http://50.99.15.26/">
+            <span class="card-title">NEXTCLOUD<span class="tag wan">WAN</span></span>
+            <p class="card-desc">
+              SilverStone serves Nextcloud on TCP 80 (LAN <code>192.168.1.200:80</code>). Update this
+              card if WAN forwarding differs.
+            </p>
+            <span class="card-url">50.99.15.26:80 (HTTP)</span>
+          </a>
+
+          <a class="card external" href="minecraft://50.99.15.26:25565">
+            <span class="card-title">MIRC<span class="tag wan">WAN</span></span>
+            <p class="card-desc">Port XXXX forwarded to your server (TCP/UDP/XXX). Some clients use “Add server” with host and port instead.</p>
+            <span class="card-url">50.99.15.26:XXX</span>
+          </a>
+          <a class="card external" href="#">
+            <span class="card-title">Add service<span class="tag wan">template</span></span>
+            <p class="card-desc">Duplicate this card, then set real protocol, host, and forwarded port.</p>
+            <span class="card-url">service.example.com:port</span>
+          </a>
+          
+          
+        </div>
+      </section>
+
+      <section id="about" aria-labelledby="about-heading">
+        <h2 id="about-heading">About</h2>
+        <div class="note">
+          <p style="margin: 0 0 0.7rem">
+            This site is a central entry point for your internal and external homelab services.
+          </p>
+          <p style="margin: 0">
+            Keep sensitive details LAN-only when possible, and prefer VPN access over exposed ports.
+          </p>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Admin contacts</h2>
+        <div class="cards">
+          <div class="card">
+            <span class="card-title">Primary admin</span>
+            <p class="card-desc">Name: add your name here</p>
+            <span class="card-url">email@example.com</span>
+          </div>
+          <div class="card">
+            <span class="card-title">Backup admin</span>
+            <p class="card-desc">Name: add backup contact</p>
+            <span class="card-url">backup@example.com</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="media" aria-labelledby="media-heading">
+        <h2 id="media-heading">Media</h2>
+        <h3>Folders</h3>
+        <div class="cards">
+          <a class="card" href="./images/backgrounds/">
+            <span class="card-title">Backgrounds <span class="tag lan">Folder</span></span>
+            <p class="card-desc">Desktop wallpapers and rotating background sets.</p>
+            <span class="card-url">./images/backgrounds/</span>
+          </a>
+          <a class="card" href="./images/icons/">
+            <span class="card-title">Icons <span class="tag lan">Folder</span></span>
+            <p class="card-desc">Buff icon pack and service icon assets.</p>
+            <span class="card-url">./images/icons/</span>
+          </a>
+        </div>
+        <h3>Background gallery</h3>
+        <div class="page-grid">
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-aurora.svg"
+              alt="Aurora background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Aurora set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-aurora.svg</p>
+            </div>
+          </a>
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-mountain.svg"
+              alt="Mountain background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Mountain set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-mountain.svg</p>
+            </div>
+          </a>
+          <a class="gallery-item" href="./images/backgrounds/">
+            <img
+              class="gallery-thumb"
+              src="./images/backgrounds/placeholder-grid.svg"
+              alt="Grid background placeholder"
+            />
+            <div class="gallery-meta">
+              <p class="gallery-title">Grid set</p>
+              <p class="gallery-subtitle">images/backgrounds/placeholder-grid.svg</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section id="info" aria-labelledby="info-heading">
+        <h2 id="info-heading">Notes</h2>
+        <div class="note">
+          <p style="margin: 0 0 0.75rem">
+            Host this file with <code>nginx</code>, <code>Caddy</code>, or
+            <code>python -m http.server</code>. If the page is reachable from the public
+            internet, WAN IP and port-forward details help attackers map your network — keep
+            this copy LAN-only or strip sensitive rows.
+          </p>
+          <p style="margin: 0">
+            You had <code>50.99.15.26/weather</code> in your notes; only the address is shown
+            above. Add a separate link if that was a real URL.
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p class="footer-line">
+          SilverStone Homelab v1.1 — static HTML. Last updated: 2026-04-18
+        </p>
+        <p class="footer-line">
+          <a
+            href="https://github.com/SilverStone/Lab"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub · SilverStone/Lab</a>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

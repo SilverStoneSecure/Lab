@@ -3,8 +3,9 @@
 
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+# shellcheck source=./common.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+project_root
 
 fail=0
 warn() { echo "WARN: $*" >&2; }
@@ -16,7 +17,7 @@ id
 echo
 
 echo "=== docker group ==="
-if groups | grep -qw docker; then
+if groups | rg -w docker >/dev/null 2>&1; then
   echo "OK: user is in group 'docker'"
 else
   err "user is NOT in group 'docker' (sudo usermod -aG docker \"\$USER\" then log out/in)"
@@ -47,7 +48,7 @@ echo
 
 echo "=== project files ==="
 test -f Dockerfile || err "missing Dockerfile"
-test -f docker-compose.yml || err "missing docker-compose.yml"
+test -f "${DOCKER_COMPOSE_FILE}" || err "missing docker-compose.yml"
 test -f package.json || err "missing package.json"
 test -f package-lock.json || err "missing package-lock.json (npm ci in Docker will fail)"
 test -f docker-entrypoint.sh || err "missing docker-entrypoint.sh"
@@ -56,7 +57,7 @@ if [[ -x docker-entrypoint.sh ]]; then
 else
   err "docker-entrypoint.sh is not executable (chmod +x docker-entrypoint.sh)"
 fi
-if [[ -f .env ]]; then
+if [[ -f "${ENV_FILE}" ]]; then
   echo "OK: .env exists"
 else
   warn ".env missing — copy .env.example to .env before compose"

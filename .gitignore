@@ -2,6 +2,16 @@ node_modules/
 .env
 data/*.db
 data/*.sqlite
+data/*.db-wal
+data/*.db-shm
 dist/
 npm-debug.log*
 yarn-error.log*
+
+# Local DB backups / scratch exports
+context/*.sqlite
+context/*.sql
+
+# Accidental webpage scrape artifacts
+src/public/images/backgrounds/*on DeviantArt.html
+src/public/images/backgrounds/*on DeviantArt_files/

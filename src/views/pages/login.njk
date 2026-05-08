@@ -1,0 +1,51 @@
+{% extends "layouts/base.njk" %}
+{% block content %}
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="brand-badge">{{ site.login_badge }}</span>
+      <h1>{{ site.login_title }}</h1>
+      <p class="subtitle">{{ site.login_subtitle }}</p>
+    </div>
+  </header>
+  <nav class="quick-nav" aria-label="Site navigation">
+    <a href="/">{{ site.nav_label_home }}</a>
+    <a href="/#devices">{{ site.nav_label_devices }}</a>
+    <a href="/#internal">{{ site.nav_label_internal }}</a>
+    <a href="/#inventory">{{ site.nav_label_inventory }}</a>
+    <a href="/#external">{{ site.nav_label_external }}</a>
+    <a href="/#about">{{ site.nav_label_about }}</a>
+    <a href="/#contact">{{ site.nav_label_contact }}</a>
+    <a href="/#media">{{ site.nav_label_media }}</a>
+    <div class="dropdown">
+      <button class="nav-pill" type="button" aria-haspopup="true">{{ site.nav_label_categories }}</button>
+      <div class="dropdown-content">
+        <a href="/#devices">{{ site.nav_label_devices }}</a>
+        <a href="/#contact">{{ site.nav_label_contact }}</a>
+        <a href="/#about">{{ site.nav_label_about }}</a>
+        <a href="/#media">{{ site.nav_label_media }}</a>
+        <a href="/public/images/backgrounds/">{{ site.nav_label_images_backgrounds }}</a>
+        <a href="/public/images/icons/">{{ site.nav_label_images_icons }}</a>
+      </div>
+    </div>
+    <button type="button" class="nav-pill" onclick="history.back()">{{ site.login_action_back }}</button>
+  </nav>
+  <section>
+    <div class="note">
+      <p class="auth-dev-hint">
+        <strong>{{ site.login_dev_label }}</strong>
+        {{ site.login_label_username }}: <code>{{ site.login_dev_username }}</code> |
+        {{ site.login_label_password }}: <code>{{ site.login_dev_password }}</code>
+      </p>
+      {% if error %}
+      <p class="auth-error">{{ error }}</p>
+      {% endif %}
+      <form method="post" action="/login">
+        <p><label>{{ site.login_label_username }} <input name="username" value="{{ site.login_dev_username }}" required /></label></p>
+        <p><label>{{ site.login_label_password }} <input type="text" name="password" value="{{ site.login_dev_password }}" required /></label></p>
+        <p><button type="submit" class="action-btn action-btn--save">{{ site.login_action_sign_in }}</button></p>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

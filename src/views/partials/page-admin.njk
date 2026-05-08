@@ -1,0 +1,92 @@
+<section class="page-content-admin" aria-labelledby="card-containers-manager">
+  <h2 id="card-containers-manager" class="page-admin-sub">Card containers</h2>
+  <p class="page-admin-lead">A container holds cards. Start with <code>internal</code> (ON THE LAN), then duplicate and sort as needed.</p>
+  <p class="card-table-footer">
+    <button type="button" class="action-btn action-btn--add" @click.prevent="containerOpenId = (containerOpenId === 'new' ? null : 'new')">Add container</button>
+  </p>
+  <div class="table-wrap">
+    <table class="inv status-lines-admin">
+      <thead>
+        <tr>
+          <th>Section key</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Layout</th>
+          <th>Display order</th>
+          <th>Shown</th>
+          <th class="col-save">Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for container in allCardContainers %}
+        <tr x-show="String(containerOpenId) !== '{{ container.id }}' && containerOpenId !== 'new'">
+          <td class="mono">{{ container.section_key }}</td>
+          <td>{{ container.title }}</td>
+          <td>{{ container.category }}</td>
+          <td>{{ container.layout }}</td>
+          <td>{{ container.display_order }}</td>
+          <td>{% if container.is_shown %}Yes{% else %}No{% endif %}</td>
+          <td class="col-save">
+            <button type="button" class="action-btn action-btn--edit" @click.prevent="containerOpenId = (String(containerOpenId) === '{{ container.id }}' ? null : '{{ container.id }}')">Edit</button>
+            <form method="post" action="/admin/card-containers/{{ container.id }}/duplicate" style="display:inline">
+              <button type="submit" class="action-btn action-btn--add">Duplicate</button>
+            </form>
+          </td>
+        </tr>
+        <tr class="inv-row-edit" x-show="String(containerOpenId) === '{{ container.id }}'">
+          <td class="mono">{{ container.section_key }}</td>
+          <td colspan="6">
+            <form method="post" action="/admin/card-containers/{{ container.id }}" class="card-inline-form">
+              <div class="inv-edit-grid">
+                <p><label>Title<br /><input name="title" value="{{ container.title }}" required /></label></p>
+                <p><label>Category<br /><input name="category" value="{{ container.category }}" /></label></p>
+                <p><label>Layout<br />
+                  <select name="layout">
+                    <option value="tiles" {% if container.layout == 'tiles' %}selected{% endif %}>Tiles (standard grid)</option>
+                    <option value="rail" {% if container.layout == 'rail' %}selected{% endif %}>Rail (horizontal scroll)</option>
+                    <option value="gallery" {% if container.layout == 'gallery' %}selected{% endif %}>Gallery (image grid)</option>
+                  </select>
+                </label></p>
+                <p><label>Display order<br /><input name="display_order" type="number" value="{{ container.display_order }}" /></label></p>
+                <p><label><input name="is_shown" type="checkbox" value="1" {% if container.is_shown %}checked{% endif %} /> Shown</label></p>
+              </div>
+              <p class="card-edit-toolbar card-edit-toolbar--split">
+                <span class="card-edit-left">
+                  <button type="submit" class="action-btn action-btn--save">Save</button>
+                  <button type="button" class="action-btn action-btn--cancel" @click.prevent="containerOpenId = null">{{ site.card_action_cancel }}</button>
+                </span>
+                <button type="submit" formaction="/admin/card-containers/{{ container.id }}/delete" formmethod="post" class="action-btn action-btn--delete" onclick="return confirm('Delete this card container? Cards in this section will be reassigned.');">Delete</button>
+              </p>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+        <tr x-show="containerOpenId === 'new'">
+          <td class="mono">new_container</td>
+          <td colspan="6">
+            <form method="post" action="/admin/card-containers" class="card-inline-form">
+              <div class="inv-edit-grid">
+                <p><label>Section key<br /><input name="section_key" placeholder="on_the_lan" required /></label></p>
+                <p><label>Title<br /><input name="title" placeholder="On the LAN" required /></label></p>
+                <p><label>Category<br /><input name="category" value="general" /></label></p>
+                <p><label>Layout<br />
+                  <select name="layout">
+                    <option value="tiles" selected>Tiles (standard grid)</option>
+                    <option value="rail">Rail (horizontal scroll)</option>
+                    <option value="gallery">Gallery (image grid)</option>
+                  </select>
+                </label></p>
+                <p><label>Display order<br /><input name="display_order" type="number" value="100" /></label></p>
+                <p><label><input name="is_shown" type="checkbox" value="1" checked /> Shown</label></p>
+              </div>
+              <p class="card-edit-toolbar">
+                <button type="submit" class="action-btn action-btn--save">Save container</button>
+                <button type="button" class="action-btn action-btn--cancel" @click.prevent="containerOpenId = null">{{ site.card_action_cancel }}</button>
+              </p>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

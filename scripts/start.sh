@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build Docker images for this project. Run from anywhere.
+# Start containers in detached mode (docker compose up -d).
 
 set -euo pipefail
 
@@ -11,7 +11,10 @@ if [[ -f scripts/check-env.sh ]]; then
   bash scripts/check-env.sh
 fi
 
-echo "=== docker compose build ==="
-docker compose build "$@"
+echo "=== docker compose up -d ==="
+docker compose up -d "$@"
 
+HOST_PORT="$(read_env_port)"
+
+echo "App should be available at: http://localhost:${HOST_PORT}/"
 echo "=== done ==="

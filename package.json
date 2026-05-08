@@ -1,0 +1,31 @@
+{
+  "name": "portable-lab-template",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable Node.js homelab dashboard template with SQLite and admin editing.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "seed:lab": "node scripts/seed-lab.js",
+    "create-admin": "node scripts/create-admin.js",
+    "reset-admin-password": "node scripts/reset-admin-password.js",
+    "check-env": "bash scripts/check-env.sh",
+    "docker:build": "bash scripts/build.sh",
+    "docker:start": "bash scripts/start.sh",
+    "docker:stop": "bash scripts/stop.sh",
+    "docker:status": "bash scripts/status.sh"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^10.0.1",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/static": "^8.3.0",
+    "@fastify/view": "^11.1.1",
+    "argon2": "^0.44.0",
+    "better-sqlite3": "^12.4.1",
+    "fastify": "^5.6.1",
+    "nunjucks": "^3.2.4"
+  }
+}

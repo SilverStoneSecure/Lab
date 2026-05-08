@@ -1,0 +1,355 @@
+{% extends "layouts/base.njk" %}
+{% from "partials/card-table.njk" import card_table, admin_open_inv_edit, card_form_fields %}
+
+{% macro pill_options(selected) %}
+<option value="" {% if not selected %}selected{% endif %}>{{ site.pill_none }}</option>
+<option value="ok" {% if selected == 'ok' %}selected{% endif %}>{{ site.pill_ok }}</option>
+<option value="q" {% if selected == 'q' %}selected{% endif %}>{{ site.pill_q }}</option>
+{% endmacro %}
+
+{% block content %}
+<div x-data="{
+  activeCardSection: null,
+  activeCardId: null,
+  activeNewSection: null,
+  invOpenId: null,
+  statusOpenId: null,
+  containerOpenId: null,
+  scrollCardRail(evt, direction) {
+    const btn = evt?.currentTarget;
+    const shell = btn?.closest('.internal-strip-shell');
+    const rail = shell?.querySelector('.card-tile-grid');
+    if (!rail) return;
+    const step = Math.max(Math.round(rail.clientWidth * 0.82), 240);
+    rail.scrollBy({ left: step * direction, behavior: 'smooth' });
+  },
+  openCardEditor(section, cardId) {
+    const same = this.activeCardSection === section && this.activeCardId === String(cardId);
+    this.activeCardSection = same ? null : section;
+    this.activeCardId = same ? null : String(cardId);
+    this.activeNewSection = null;
+  },
+  isCardEditorOpen(section, cardId) {
+    return this.activeCardSection === section && this.activeCardId === String(cardId);
+  },
+  openNewCard(section) {
+    const same = this.activeNewSection === section;
+    this.activeNewSection = same ? null : section;
+    this.activeCardSection = null;
+    this.activeCardId = null;
+  },
+  isNewCardOpen(section) {
+    return this.activeNewSection === section;
+  },
+  closeCardEditors() {
+    this.activeCardSection = null;
+    this.activeCardId = null;
+    this.activeNewSection = null;
+  }
+}">
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="brand-top">
+        <span class="brand-badge">{{ site.brand_badge }}</span>
+        <span class="header-auth">
+          {% if session %}
+          <span class="header-auth-user">{{ site.status_signed_in_as }} {{ session.username }}</span>
+          <form method="post" action="/logout" style="display:inline"><button type="submit" class="action-btn action-btn--logout">{{ site.status_logout }}</button></form>
+          {% else %}
+          <a href="/login" class="action-btn action-btn--login">{{ site.nav_label_login }}</a>
+          {% endif %}
+        </span>
+      </div>
+      <h1>{{ site.brand_title }}</h1>
+      {% if session and session.role == "admin" %}
+      <div id="snippet-brand_title" class="doc-snippet-admin doc-snippet-admin--hero" tabindex="-1">
+        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+          <input type="hidden" name="_snippet_anchor" value="brand_title" />
+          <label class="doc-snippet-label" for="hdr-brand_title">brand_title</label>
+          <input id="hdr-brand_title" type="text" name="brand_title" value="{{ site.brand_title }}" autocomplete="off" />
+          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+        </form>
+      </div>
+      {% endif %}
+      <p class="subtitle">
+        {{ site.brand_subtitle | safe }}
+      </p>
+      <nav class="quick-nav" aria-label="Site navigation">
+        <a href="/">{{ site.nav_label_home }}</a>
+        <a href="#devices">{{ site.nav_label_devices }}</a>
+        <a href="#internal">{{ site.nav_label_internal }}</a>
+        <a href="#inventory">{{ site.nav_label_inventory }}</a>
+        <a href="#external">{{ site.nav_label_external }}</a>
+        <a href="#about">{{ site.nav_label_about }}</a>
+        <a href="#contact">{{ site.nav_label_contact }}</a>
+        <a href="#media_folder">{{ site.nav_label_media }}</a>
+        <div class="dropdown">
+          <button class="dropbtn nav-pill" type="button" aria-haspopup="true">{{ site.nav_label_categories }}</button>
+          <div class="dropdown-content">
+            <a href="#devices">{{ site.nav_label_devices }}</a>
+            <a href="#contact">{{ site.nav_label_contact }}</a>
+            <a href="#about">{{ site.nav_label_about }}</a>
+            <a href="#media_folder">{{ site.nav_label_media }}</a>
+            <a href="/public/images/backgrounds/">{{ site.nav_label_images_backgrounds }}</a>
+            <a href="/public/images/icons/">{{ site.nav_label_images_icons }}</a>
+          </div>
+        </div>
+      </nav>
+      {% if session and session.role == "admin" %}
+      <p class="quick-nav-admin-link">
+        <a href="#card-containers-manager" class="nav-pill">Card container manager</a>
+      </p>
+      {% endif %}
+      <div class="overview-card card-tile">
+        <p class="status-wan"><strong>{{ site.status_label_wan }}</strong> {{ site.status_wan }}</p>
+        <p class="status-host"><strong>{{ site.status_host }}</strong></p>
+        {% if statusLines.length %}
+        <ul class="status-list">
+          {% for line in statusLines %}
+          <li>{{ line.body | safe }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if session and session.role == "admin" %}
+        <div id="snippet-status_label_wan" class="doc-snippet-admin" tabindex="-1">
+          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+            <input type="hidden" name="_snippet_anchor" value="status_label_wan" />
+            <label class="doc-snippet-label" for="ov-status_label_wan">status_label_wan</label>
+            <input id="ov-status_label_wan" type="text" name="status_label_wan" value="{{ site.status_label_wan }}" />
+            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+          </form>
+        </div>
+        <div id="snippet-status_wan" class="doc-snippet-admin" tabindex="-1">
+          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+            <input type="hidden" name="_snippet_anchor" value="status_wan" />
+            <label class="doc-snippet-label" for="ov-status_wan">status_wan</label>
+            <input id="ov-status_wan" type="text" name="status_wan" value="{{ site.status_wan }}" />
+            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+          </form>
+        </div>
+        <div id="snippet-status_host" class="doc-snippet-admin" tabindex="-1">
+          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+            <input type="hidden" name="_snippet_anchor" value="status_host" />
+            <label class="doc-snippet-label" for="ov-status_host">status_host</label>
+            <input id="ov-status_host" type="text" name="status_host" value="{{ site.status_host }}" />
+            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+          </form>
+        </div>
+        <div class="overview-ports-admin">
+          {% for line in statusLines %}
+          <div class="overview-port-row">
+            <form method="post" action="/admin/status-lines/{{ line.id }}" class="card-inline-form overview-port-form">
+              <input name="body" value="{{ line.body }}" />
+              <button type="submit" class="action-btn action-btn--save">{{ site.status_action_save_line }}</button>
+            </form>
+            <form method="post" action="/admin/status-lines/{{ line.id }}/delete" class="card-inline-form" onsubmit="return confirm('{{ site.status_confirm_delete_line }}');">
+              <button type="submit" class="action-btn action-btn--delete">{{ site.status_action_delete_line }}</button>
+            </form>
+          </div>
+          {% endfor %}
+          <form method="post" action="/admin/status-lines" class="card-inline-form overview-port-add">
+            <input name="body" placeholder="{{ site.page_admin_status_new_placeholder }}" />
+            <button type="submit" class="action-btn action-btn--add">{{ site.status_action_add_line }}</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% for container in cardContainers %}
+  {% if container.section_key == 'external' %}
+  {% set default_tag = 'wan' %}
+  {% elif container.section_key == 'devices' %}
+  {% set default_tag = 'device' %}
+  {% elif container.section_key == 'media_folder' %}
+  {% set default_tag = 'folder' %}
+  {% elif container.section_key == 'media_gallery' %}
+  {% set default_tag = 'service' %}
+  {% else %}
+  {% set default_tag = 'lan' %}
+  {% endif %}
+  {% if container.section_key == 'external' %}
+  {% set table_mod = 'card-sheet--external' %}
+  {% else %}
+  {% set table_mod = '' %}
+  {% endif %}
+  {% if container.layout == 'gallery' %}
+  {% set url_def = '/public/images/backgrounds/' %}
+  {% set img_def = '/public/images/backgrounds/placeholder-aurora.svg' %}
+  {% else %}
+  {% set url_def = '' %}
+  {% set img_def = '' %}
+  {% endif %}
+  {{ card_table(container.section_key, container.title, (cardsBySection[container.section_key] or []), container.section_key, session, table_mod, default_tag, 'section', 'h2', site, allCardContainers, container.layout, url_def, img_def) }}
+  {% endfor %}
+
+  <section id="inventory" aria-labelledby="inventory-heading">
+    <h2 id="inventory-heading">{{ site.heading_inventory }}</h2>
+    <div class="card-tile-grid inventory-tile-grid">
+      {% for row in inventory %}
+      <article id="inv-{{ row.id }}" class="card-tile inventory-tile">
+        <p class="card-tile-top">
+          <span class="card-tile-title">
+            {% if row.link %}<a href="{{ row.link }}" class="card-tile-title">{{ row.host }}</a>{% else %}{{ row.host }}{% endif %}
+          </span>
+          {% if row.pill == "ok" %}<span class="pill ok">{{ site.pill_confirmed }}</span>{% elif row.pill == "q" %}<span class="pill q">{{ row.pill_caption }}</span>{% endif %}
+        </p>
+        <p class="inventory-meta mono">{{ site.inventory_col_mac }}: {% if row.mac %}{{ row.mac }}{% else %}—{% endif %}</p>
+        <p class="inventory-meta mono">{{ site.inventory_col_ipv4 }}: {% if row.ipv4 %}{{ row.ipv4 }}{% else %}—{% endif %}</p>
+        <p class="card-desc">{{ row.notes }}</p>
+        {% if session and session.role == "admin" %}
+        <p class="card-tile-footer">
+          <button type="button" class="action-btn action-btn--edit" @click.prevent="invOpenId = (String(invOpenId) === '{{ row.id }}' ? null : '{{ row.id }}')">{{ site.inventory_action_edit }}</button>
+        </p>
+        <div class="card-inline-panel" x-show="String(invOpenId) === '{{ row.id }}'" style="display:none;" x-bind:style="String(invOpenId) === '{{ row.id }}' ? 'display:block' : ''">
+          <form method="post" action="/admin/inventory/{{ row.id }}" class="card-inline-form">
+            <div class="inv-edit-grid">
+              <p><label>{{ site.inventory_label_host }}<br /><input name="host" value="{{ row.host }}" required /></label></p>
+              <p><label>{{ site.inventory_label_link }}<br /><input name="link" value="{{ row.link }}" /></label></p>
+              <p><label>{{ site.inventory_label_mac }}<br /><input name="mac" value="{{ row.mac }}" class="mono" /></label></p>
+              <p><label>{{ site.inventory_label_ipv4 }}<br /><input name="ipv4" value="{{ row.ipv4 }}" /></label></p>
+              <p><label>{{ site.inventory_label_pill }}<br /><select name="pill">{{ pill_options(row.pill) }}</select></label></p>
+              <p><label>{{ site.inventory_label_pill_caption_q }}<br /><input name="pill_caption" value="{{ row.pill_caption }}" /></label></p>
+              <p class="inv-span-notes"><label>{{ site.inventory_label_notes }}<br /><input name="notes" value="{{ row.notes }}" /></label></p>
+            </div>
+            <p class="card-edit-toolbar card-edit-toolbar--split">
+              <span class="card-edit-left">
+                <button type="submit" class="action-btn action-btn--save">{{ site.inventory_action_save_row }}</button>
+                <button type="button" class="action-btn action-btn--cancel" @click.prevent="invOpenId = null">{{ site.inventory_action_cancel }}</button>
+              </span>
+              <button type="submit" formaction="/admin/inventory/{{ row.id }}/delete" formmethod="post" class="action-btn action-btn--delete" onclick="return confirm('{{ site.inventory_confirm_delete }}');">{{ site.inventory_action_delete_row }}</button>
+            </p>
+          </form>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% if session and session.role == "admin" %}
+    <div class="card-new-wrap" x-show="invOpenId === 'new'" style="display:none;" x-bind:style="invOpenId === 'new' ? 'display:block' : ''">
+      <form method="post" action="/admin/inventory" class="card-inline-form">
+        <div class="inv-edit-grid">
+          <p><label>{{ site.inventory_label_host }}<br /><input name="host" value="{{ site.inventory_new_host_default }}" required /></label></p>
+          <p><label>{{ site.inventory_label_link }}<br /><input name="link" /></label></p>
+          <p><label>{{ site.inventory_label_mac }}<br /><input name="mac" /></label></p>
+          <p><label>{{ site.inventory_label_ipv4 }}<br /><input name="ipv4" /></label></p>
+          <p><label>{{ site.inventory_label_pill }}<br /><select name="pill">{{ pill_options('') }}</select></label></p>
+          <p><label>{{ site.inventory_label_pill_caption }}<br /><input name="pill_caption" /></label></p>
+          <p class="inv-span-notes"><label>{{ site.inventory_label_notes }}<br /><input name="notes" /></label></p>
+        </div>
+        <p class="card-edit-toolbar">
+          <button type="submit" class="action-btn action-btn--save">{{ site.inventory_action_save_new_row }}</button>
+          <button type="button" class="action-btn action-btn--cancel" @click.prevent="invOpenId = null">{{ site.inventory_action_cancel }}</button>
+        </p>
+      </form>
+    </div>
+    <p class="card-table-footer">
+      <button type="button" class="action-btn action-btn--add" @click.prevent="invOpenId = (invOpenId === 'new' ? null : 'new')">{{ site.inventory_action_add_row }}</button>
+    </p>
+    {% endif %}
+  </section>
+
+  <section id="about" aria-labelledby="about-heading">
+    <h2 id="about-heading">{{ site.heading_about }}</h2>
+    {% if session and session.role == "admin" %}
+    <div id="snippet-heading_about" class="doc-snippet-admin" tabindex="-1">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_next" value="about" />
+        <label class="doc-snippet-label" for="about-in-heading">heading_about</label>
+        <input id="about-in-heading" type="text" name="heading_about" value="{{ site.heading_about }}" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    {% endif %}
+    <div class="note">
+      <p style="margin: 0 0 0.7rem">
+        {{ site.about_p1 | safe }}
+      </p>
+      {% if session and session.role == "admin" %}
+      <div id="snippet-about_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+          <input type="hidden" name="_next" value="about" />
+          <label class="doc-snippet-label" for="about-in-p1">about_p1</label>
+          <textarea id="about-in-p1" name="about_p1" rows="5">{{ site.about_p1 }}</textarea>
+          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+        </form>
+      </div>
+      {% endif %}
+      <p style="margin: 0">
+        {{ site.about_p2 | safe }}
+      </p>
+      {% if session and session.role == "admin" %}
+      <div id="snippet-about_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+          <input type="hidden" name="_next" value="about" />
+          <label class="doc-snippet-label" for="about-in-p2">about_p2</label>
+          <textarea id="about-in-p2" name="about_p2" rows="5">{{ site.about_p2 }}</textarea>
+          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section id="info" aria-labelledby="info-heading">
+    <h2 id="info-heading">{{ site.heading_notes }}</h2>
+    {% if session and session.role == "admin" %}
+    <div id="snippet-heading_notes" class="doc-snippet-admin" tabindex="-1">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_next" value="info" />
+        <label class="doc-snippet-label" for="notes-in-heading">heading_notes</label>
+        <input id="notes-in-heading" type="text" name="heading_notes" value="{{ site.heading_notes }}" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    {% endif %}
+    <div class="note">
+      <p style="margin: 0 0 0.75rem">
+        {{ site.notes_p1 | safe }}
+      </p>
+      {% if session and session.role == "admin" %}
+      <div id="snippet-notes_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+          <input type="hidden" name="_next" value="info" />
+          <label class="doc-snippet-label" for="notes-in-p1">notes_p1</label>
+          <textarea id="notes-in-p1" name="notes_p1" rows="5">{{ site.notes_p1 }}</textarea>
+          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+        </form>
+      </div>
+      {% endif %}
+      <p style="margin: 0">
+        {{ site.notes_p2 | safe }}
+      </p>
+      {% if session and session.role == "admin" %}
+      <div id="snippet-notes_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+          <input type="hidden" name="_next" value="info" />
+          <label class="doc-snippet-label" for="notes-in-p2">notes_p2</label>
+          <textarea id="notes-in-p2" name="notes_p2" rows="5">{{ site.notes_p2 }}</textarea>
+          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if session and session.role == "admin" %}
+  {% include "partials/page-admin.njk" %}
+  {% endif %}
+
+  <footer>
+    <p class="footer-line">
+      {{ site.footer_line1 }}
+    </p>
+    <p class="footer-line">
+      {{ site.footer_line2 | safe }}
+    </p>
+  </footer>
+  </div>
+</div>
+{% endblock %}
