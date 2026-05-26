@@ -14,7 +14,9 @@ Date: 2026-05-25
 - Connected VS Code on T420 to silverstone remotely — filesystem is silverstone's
 - Opened project at `/home/chad/Public/www/Lab` in VS Code
 - Next step: open integrated terminal in VS Code and run `claude` on silverstone
+- Started the app on port `3001` and verified the homepage is reachable at `http://localhost:3001`
+- Confirmed app is running on host `silverstone` with remote access potential via IPv6 `2001:56a:e937:c000:870a:c5fc:52e0:d514`
 
 ## Session Shutdown Review
-- 2026-05-26: Reviewed shutdown skill; preserved summary and preferences files.
+- 2026-05-26: Performed shutdown review; updated session artifacts and preserved runtime state.
 - No app or Docker services stopped without explicit confirmation.

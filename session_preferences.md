@@ -20,3 +20,4 @@ Last reviewed: 2026-05-26
 - `vscode-remote` — automate Remote-SSH extension install & connect.
 - `claude-credentials-transfer` — securely transfer credentials via scp.
 - `credential-rotation` — detect leaked tokens and guide rotation.
+- `btr` — build/test/run helper to verify env, start the app, and confirm homepage availability.
