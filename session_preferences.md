@@ -1,7 +1,7 @@
 # Session Preferences & Analysis
 
 Generated: 2026-05-25
-Last reviewed: 2026-05-26
+Last reviewed: 2026-05-26 (afternoon)
 
 ## Observed Preferences
 - Preferred service port: 3001 (requested change from 3000).
@@ -16,6 +16,8 @@ Last reviewed: 2026-05-26
 - Document daily work in `daily_summary.md` with a new dated section.
 - Commit and push session artifact updates to git after review.
 - Only expose WAN access after router/firewall port forwarding is configured for `3001/tcp`.
+- Prefers Claude Code (VS Code extension) over GitHub Copilot for AI-assisted coding.
+- For project tidying, prefers a moderate, convention-respecting reorganization (e.g., move docker files into `docker/`, env templates into `env/`) rather than aggressive restructuring that breaks tooling defaults.
 
 ## Related files
 - `myPreferences.md` (project root)
