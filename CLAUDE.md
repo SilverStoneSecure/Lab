@@ -34,8 +34,8 @@ src/            # app source (server, routes, views, public assets)
 scripts/        # migrate, seed, admin tooling, docker helpers
 data/           # runtime SQLite DB (gitignored)
 reference/      # frozen Lab HTML for visual diffing
-docker-*        # Dockerfile, compose, entrypoint
-.env.example    # env templates (sqlite/postgres/mariadb)
+docker/         # Dockerfile, docker-compose.yml, docker-entrypoint.sh
+env/            # .env.example, .env.postgres.example, .env.mariadb.example
 ```
 
 ---
@@ -87,7 +87,7 @@ docker-*        # Dockerfile, compose, entrypoint
 
 > *Env vars, secrets, and how to configure for local vs. prod.*
 
-- Copy `.env.example` → `.env` for local dev
+- Copy `env/.env.example` → `.env` (at repo root) for local dev
 - `DB_CLIENT=sqlite` + `SQLITE_PATH=./data/app.db` for default
 - `SESSION_SECURE=0` for HTTP, `1` when behind TLS
 - `ALLOW_DEFAULT_ADMIN=1` enables the default `admin / Admin123!pass` seed in production (dev does this automatically)
@@ -121,7 +121,7 @@ docker-*        # Dockerfile, compose, entrypoint
 **Examples to fill in:**
 - `seed:lab` wipes cards + inventory but never users — safe to re-run
 - Passwords with `!` or `$` need single quotes in npm script args
-- `docker-entrypoint.sh` must remain executable (`chmod +x`)
+- `docker/docker-entrypoint.sh` must remain executable (`chmod +x`)
 
 ---
 

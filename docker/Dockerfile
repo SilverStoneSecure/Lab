@@ -9,8 +9,8 @@ RUN npm ci
 
 COPY . .
 
-RUN mkdir -p /app/data && chmod +x docker-entrypoint.sh
+RUN mkdir -p /app/data && chmod +x docker/docker-entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["./docker/docker-entrypoint.sh"]

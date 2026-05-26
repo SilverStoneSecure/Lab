@@ -30,7 +30,7 @@ There is **no** ESLint, Prettier, or automated test script in `package.json`; va
 | `scripts/migrate.js` | Runs schema + incremental SQLite alterations/backfills; calls `ensureBootstrapAdmin`. |
 | `scripts/seed.js`, `scripts/seed-lab.js` | Populate or reset card/inventory data. |
 | `scripts/create-admin.js`, `scripts/reset-admin-password.js` | User management CLI. |
-| `docker-compose.yml`, `Dockerfile`, `docker-entrypoint.sh` | Container build and optional migrate/seed on start. |
+| `docker/docker-compose.yml`, `docker/Dockerfile`, `docker/docker-entrypoint.sh` | Container build and optional migrate/seed on start. |
 | `reference/` | Reference HTML (`README.md` in repo root describes diffing vs Lab). |
 
 Human-oriented setup and feature lists live in **`README.md`**.
@@ -50,17 +50,17 @@ Human-oriented setup and feature lists live in **`README.md`**.
 | `npm run check-env` | Pre-flight for Docker tooling (`scripts/check-env.sh`). |
 | `npm run docker:build` / `docker:start` / `docker:stop` / `docker:status` | Shell wrappers around Compose. |
 
-Copy **`.env.example`** → **`.env`** before running. Docker maps host `PORT` to container port **3000**; inside the container `PORT` is fixed to `3000`.
+Copy **`env/.env.example`** → **`.env`** (at repo root) before running. Docker maps host `PORT` to container port **3000**; inside the container `PORT` is fixed to `3000`.
 
 ## Environment variables (summary)
 
-See **`.env.example`** for the canonical list. Important for agents:
+See **`env/.env.example`** for the canonical list. Important for agents:
 
 - **`SESSION_SECRET`** — required for serious use; dev default in code is insecure.
 - **`SESSION_SECURE`** — `1` when served over HTTPS; `0` for plain HTTP (local/Docker).
 - **`NODE_ENV=production`** — default admin bootstrap is **disabled** unless **`ALLOW_DEFAULT_ADMIN=1`** (see `src/auth/bootstrapUser.js`). Prefer `create-admin` for production.
 - **`BOOTSTRAP_ADMIN_USERNAME` / `BOOTSTRAP_ADMIN_PASSWORD`** — optional overrides when empty DB gets a default admin.
-- **`RUN_MIGRATE_ON_START`**, **`RUN_SEED_ON_START`** — read by **`docker-entrypoint.sh`** only, not by plain `npm start`.
+- **`RUN_MIGRATE_ON_START`**, **`RUN_SEED_ON_START`** — read by **`docker/docker-entrypoint.sh`** only, not by plain `npm start`.
 
 ## Patterns and conventions
 
@@ -85,7 +85,7 @@ After substantive changes:
 03. `npm run dev` and load `http://localhost:<PORT>/`.
 04. Log in as admin; confirm guest vs admin behavior and a representative admin POST.
 
-For Docker: `docker compose up --build`, then check logs and healthcheck in `docker-compose.yml`.
+For Docker: `docker compose -f docker/docker-compose.yml up --build` (or use the `npm run docker:*` wrappers), then check logs and healthcheck in `docker/docker-compose.yml`.
 
 ## GitHub sync and migration checklist
 

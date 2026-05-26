@@ -47,20 +47,20 @@ fi
 echo
 
 echo "=== project files ==="
-test -f Dockerfile || err "missing Dockerfile"
-test -f "${DOCKER_COMPOSE_FILE}" || err "missing docker-compose.yml"
+test -f docker/Dockerfile || err "missing docker/Dockerfile"
+test -f "${DOCKER_COMPOSE_FILE}" || err "missing docker/docker-compose.yml"
 test -f package.json || err "missing package.json"
 test -f package-lock.json || err "missing package-lock.json (npm ci in Docker will fail)"
-test -f docker-entrypoint.sh || err "missing docker-entrypoint.sh"
-if [[ -x docker-entrypoint.sh ]]; then
-  echo "OK: docker-entrypoint.sh is executable"
+test -f docker/docker-entrypoint.sh || err "missing docker/docker-entrypoint.sh"
+if [[ -x docker/docker-entrypoint.sh ]]; then
+  echo "OK: docker/docker-entrypoint.sh is executable"
 else
-  err "docker-entrypoint.sh is not executable (chmod +x docker-entrypoint.sh)"
+  err "docker/docker-entrypoint.sh is not executable (chmod +x docker/docker-entrypoint.sh)"
 fi
 if [[ -f "${ENV_FILE}" ]]; then
   echo "OK: .env exists"
 else
-  warn ".env missing — copy .env.example to .env before compose"
+  warn ".env missing — copy env/.env.example to .env before compose"
 fi
 echo
 

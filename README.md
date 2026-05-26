@@ -32,7 +32,7 @@ Editable cards use a tag dropdown: **LAN**, **WAN**, **Service**, **Device**, **
 ## Quick start (when Node is installed locally)
 
 1. Copy env:
-   - `cp .env.example .env`
+   - `cp env/.env.example .env`
 2. Install deps:
    - `npm install`
 3. Run migrations and seed:
@@ -53,7 +53,7 @@ From repo root:
 - `./scripts/check-env.sh`
 - or `npm run check-env`
 
-Verifies: `docker` group, `docker ps`, `node`/`npm`/`docker`/`git`, required files, `package-lock.json`, executable `docker-entrypoint.sh`, and warns if `.env` is missing.
+Verifies: `docker` group, `docker ps`, `node`/`npm`/`docker`/`git`, required files, `package-lock.json`, executable `docker/docker-entrypoint.sh`, and warns if `.env` is missing.
 
 ### Convenience scripts
 
@@ -69,7 +69,7 @@ NPM equivalents: `npm run docker:build`, `docker:start`, `docker:stop`, `docker:
 ## Docker Compose
 
 1. Copy env:
-   - `cp .env.example .env`
+   - `cp env/.env.example .env`
 2. Build and run:
    - `docker compose up --build`
 3. First time only (optional): seed — set `RUN_SEED_ON_START=1` in `.env` for one boot, or run `docker compose exec app npm run seed` / `docker compose exec app npm run seed:lab` to reload the Lab card + inventory snapshot
@@ -87,13 +87,13 @@ Compose maps host port from `.env` `PORT` to container port `3000`. Inside the c
 | `RUN_SEED_ON_START` | `0` | Run `npm run seed` before start (usually once) |
 | `SESSION_SECURE` | `0` | `0` = login works over HTTP; set `1` when TLS terminates in front of the app |
 
-Image uses `npm ci` and `NODE_ENV=production`. Entrypoint: `docker-entrypoint.sh`.
+Image uses `npm ci` and `NODE_ENV=production`. Entrypoint: `docker/docker-entrypoint.sh`.
 
 ## DB Modes
 
 - Default local: `DB_CLIENT=sqlite` and `SQLITE_PATH=./data/app.db`
 - Remote templates:
-  - `.env.postgres.example`
-  - `.env.mariadb.example`
+  - `env/.env.postgres.example`
+  - `env/.env.mariadb.example`
 
 Current implementation supports SQLite runtime. Remote DB adapter files are planned next.
