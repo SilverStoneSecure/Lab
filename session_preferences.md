@@ -1,6 +1,7 @@
 # Session Preferences & Analysis
 
 Generated: 2026-05-25
+Last reviewed: 2026-05-26
 
 ## Observed Preferences
 - Preferred service port: 3001 (requested change from 3000).
