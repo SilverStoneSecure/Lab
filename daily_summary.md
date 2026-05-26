@@ -14,8 +14,18 @@ Date: 2026-05-25
 - Connected VS Code on T420 to silverstone remotely — filesystem is silverstone's
 - Opened project at `/home/chad/Public/www/Lab` in VS Code
 - Next step: open integrated terminal in VS Code and run `claude` on silverstone
-- Started the app on port `3001` and verified the homepage is reachable at `http://localhost:3001`
-- Confirmed app is running on host `silverstone` with remote access potential via IPv6 `2001:56a:e937:c000:870a:c5fc:52e0:d514`
+
+# Tue-May-26-2026
+
+<!-- ✨ Session Snapshot ✨ -->
+Date: 2026-05-26
+
+## Session Summary
+- Updated the session-shutdown workflow and added a new `btr` skill for build/test/run validation.
+- Added `skills/btr/BTR.md` and executable helper `skills/btr/btr.sh`.
+- Started the app on port `3001` on silverstone and confirmed the homepage responded with `HTTP/1.1 200 OK`.
+- Checked silverstone's public network reachability, including IPv6 address `2001:56a:e937:c000:870a:c5fc:52e0:d514`.
+- Logged the session-shutdown review and pushed the updated artifacts to git.
 
 ## Session Shutdown Review
 - 2026-05-26: Performed shutdown review; updated session artifacts and preserved runtime state.

@@ -22,6 +22,11 @@ Collect recent session notes, identify potential automations/skills, persist ana
 - Requires explicit confirmation before stopping services or shutting down the host.
 - No app or Docker shutdown was performed during this update.
 
+## Current workflow
+- Use `skills/btr/btr.sh` to verify the environment, start the app on port `3001`, and confirm the homepage is reachable.
+- Confirm runtime state with `ss -ltnp | grep ':3001'` and `ps -p <pid> -o pid,cmd,user`.
+- For WAN exposure, verify the host is listening on `0.0.0.0:3001` and configure router/firewall port-forwarding as needed.
+
 ## Next steps
 - Implement an executable script to perform the app stop and log collection.
 - Add automated tests and a small CLI wrapper to preview actions before applying them.
