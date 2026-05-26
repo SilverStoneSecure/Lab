@@ -1,26 +1,38 @@
 ---
 name: btr
-description: Build, Test, Run skill for the Portable Lab app.
+description: Build, Test, Run helper for the Portable Lab app.
 target: local
 ---
 
 ## Purpose
-Provide a reusable local skill to verify the development environment, build or prepare the project if needed, start the app, and open the homepage for manual inspection.
+Provide a short local skill for validating the Portable Lab app environment, preparing dependencies, launching the app on port `3001`, and confirming the homepage is reachable.
 
 ## Behavior
-- Check runtime tools: `node`, `npm`, `git`.
-- Verify required files and the SQLite database path.
-- Install dependencies if missing or if `node_modules` is not present.
-- Start the app in the foreground or background when needed.
-- Confirm the homepage is reachable at `http://localhost:3001`.
-- provide an external link for testing 
-## Usage
-- Run this skill when you want a fast health check before editing or deploying.
-- It should not stop or remove local services without explicit permission.
+- Verify the runtime tools `node`, `npm`, and `git` are available.
+- Run `npm run check-env` by default to confirm repo health.
+- Install dependencies when `node_modules` is missing.
+- Start the app on `PORT=3001` if it is not already running.
+- Confirm the homepage responds at `http://localhost:3001`.
+- Document the helper script path and external-access expectations.
 
-## Quick runnable helper
-A small helper script is available at `skills/btr/btr.sh` that runs `npm run check-env`, installs dependencies if missing, checks port availability, and starts the app on `PORT=3001` (if not already running).
+## Usage
+- Run from the repository root:
+  ```bash
+  ./skills/btr/btr.sh
+  ```
+- Skip the environment preflight for a faster launch:
+  ```bash
+  SKIP_CHECK=1 ./skills/btr/btr.sh
+  ```
+
+## Helper script
+- `skills/btr/btr.sh` performs the same workflow:
+  - runs `npm run check-env` unless `SKIP_CHECK=1`
+  - installs `node_modules` if missing
+  - checks whether port `3001` is already in use
+  - starts the app and writes logs to `/tmp/btr_app.log`
 
 ## Notes
-- This repo is a Node.js app with no separate build step beyond dependency installation.
+- This repo has no separate build phase beyond dependency installation.
 - The app listens on port `3001` by default.
+- For WAN/external access, route or firewall port `3001/tcp` to this host.

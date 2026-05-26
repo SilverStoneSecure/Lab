@@ -10,6 +10,12 @@ Last reviewed: 2026-05-26
 - Prefer command-line over GUI and small copy-paste-friendly commands.
 - Confirm success at each step before proceeding.
 - Direct, concise answers; minimal explanation unless requested.
+- Prefer using the helper script `skills/btr/btr.sh` for startup validation.
+- Preserve running services and do not stop the app or Docker without explicit confirmation.
+- Confirm homepage availability locally with `curl -I http://localhost:3001` after startup.
+- Document daily work in `daily_summary.md` with a new dated section.
+- Commit and push session artifact updates to git after review.
+- Only expose WAN access after router/firewall port forwarding is configured for `3001/tcp`.
 
 ## Related files
 - `myPreferences.md` (project root)
