@@ -8,7 +8,8 @@ import nunjucks from "nunjucks";
 import { getEnv } from "./config/env.js";
 import { getDb } from "./db/client.js";
 import { ensureSiteDefaults } from "./db/siteContent.js";
-import { ensureBootstrapAdmin } from "./auth/bootstrapUser.js";
+import { runAuthGateMigration } from "./db/auth-gate-migration.js";
+import { registerAuthGateRoutes } from "./routes/auth-gate.js";
 import { registerWebRoutes } from "./routes/web.js";
 import { registerAdminRoutes } from "./routes/admin.js";
 
@@ -16,7 +17,7 @@ const env = getEnv();
 const app = Fastify({ logger: true });
 const db = getDb();
 ensureSiteDefaults(db);
-await ensureBootstrapAdmin(db);
+runAuthGateMigration(db);
 app.decorate("db", db);
 
 await app.register(fastifyCookie, { secret: env.sessionSecret });
@@ -27,9 +28,11 @@ await app.register(fastifyStatic, {
 });
 await app.register(fastifyView, {
   engine: { nunjucks },
-  root: path.join(process.cwd(), "src/views")
+  root: path.join(process.cwd(), "src/views"),
+  options: { noCache: true }
 });
 
+await registerAuthGateRoutes(app);
 await registerWebRoutes(app);
 await registerAdminRoutes(app);
 

@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="{% if site and site.meta_description %}{{ site.meta_description }}{% else %}SilverStone homelab — one-page dashboard: LAN and WAN links, device inventory, media, and notes.{% endif %}"
+      content="{% if site and site.meta_description %}{{ site.meta_description }}{% else %}SilverStone homelab dashboard.{% endif %}"
     />
     <title>{% block title %}{% if site and site.page_title %}{{ site.page_title }}{% else %}SilverStoneLab{% endif %}{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="/public/ss-brand.css" />
     <link rel="stylesheet" href="/public/styles.css" />
     {% block head %}{% endblock %}
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

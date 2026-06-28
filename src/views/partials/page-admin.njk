@@ -40,6 +40,7 @@
               <div class="inv-edit-grid">
                 <p><label>Title<br /><input name="title" value="{{ container.title }}" required /></label></p>
                 <p><label>Category<br /><input name="category" value="{{ container.category }}" /></label></p>
+                <p class="inv-span-notes"><label>Description (note shown above cards)<br /><textarea name="description" rows="2">{{ container.description }}</textarea></label></p>
                 <p><label>Layout<br />
                   <select name="layout">
                     <option value="tiles" {% if container.layout == 'tiles' %}selected{% endif %}>Tiles (standard grid)</option>
@@ -69,6 +70,7 @@
                 <p><label>Section key<br /><input name="section_key" placeholder="on_the_lan" required /></label></p>
                 <p><label>Title<br /><input name="title" placeholder="On the LAN" required /></label></p>
                 <p><label>Category<br /><input name="category" value="general" /></label></p>
+                <p class="inv-span-notes"><label>Description (optional note above cards)<br /><textarea name="description" rows="2"></textarea></label></p>
                 <p><label>Layout<br />
                   <select name="layout">
                     <option value="tiles" selected>Tiles (standard grid)</option>

@@ -33,6 +33,7 @@ export const labInventoryRows = [
 
 export const labCards = [
   // --- On the LAN ---
+  ["projects", "4D AI Conversations · QP-001", "Aide-de-mémoire — recce patrol orders format. Fills iteratively.", "http://192.168.1.200:8080/aio/artifacts/ai-aide-de-memoire.html", "folder", 1, "🧠", 1],
   ["internal", "SilverStone · Nextcloud", "Ethernet host (confirmed). Nextcloud on TCP 80.", "http://192.168.1.200/", "lan", 1, "", 0],
   ["internal", "SilverStone · Apache2", "Apache2 on TCP 8080 (same machine as Nextcloud).", "http://192.168.1.200:8080/", "lan", 2, "", 0],
   ["internal", "T420", "Wi‑Fi address (confirmed).", "http://192.168.1.120/", "lan", 3, "", 0],

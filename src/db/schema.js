@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL CHECK(role IN ('admin', 'viewer')),
+  must_change_password INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -13,6 +14,7 @@ CREATE TABLE IF NOT EXISTS card_containers (
   title TEXT NOT NULL,
   category TEXT NOT NULL DEFAULT 'general',
   layout TEXT NOT NULL DEFAULT 'tiles',
+  description TEXT NOT NULL DEFAULT '',
   display_order INTEGER NOT NULL DEFAULT 0,
   is_shown INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -27,6 +29,7 @@ CREATE TABLE IF NOT EXISTS cards (
   description TEXT NOT NULL DEFAULT '',
   url TEXT NOT NULL DEFAULT '#',
   tag TEXT NOT NULL DEFAULT 'lan',
+  icon TEXT NOT NULL DEFAULT '',
   sort_order INTEGER NOT NULL DEFAULT 0,
   image_url TEXT NOT NULL DEFAULT '',
   open_new_tab INTEGER NOT NULL DEFAULT 0,

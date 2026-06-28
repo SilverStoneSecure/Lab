@@ -1,7 +1,7 @@
 import { getDb } from "../src/db/client.js";
 import { migrationSql } from "../src/db/schema.js";
 import { ensureSiteDefaults } from "../src/db/siteContent.js";
-import { ensureBootstrapAdmin } from "../src/auth/bootstrapUser.js";
+import { runAuthGateMigration } from "../src/db/auth-gate-migration.js";
 
 const db = getDb();
 db.exec(migrationSql);
@@ -16,11 +16,14 @@ function addColumnIfMissing(table, columnSql) {
 }
 
 try {
+  addColumnIfMissing("users", "must_change_password INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing("cards", "image_url TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing("cards", "open_new_tab INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing("cards", "icon TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing("inventory_rows", "pill TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing("inventory_rows", "pill_caption TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing("card_containers", "layout TEXT NOT NULL DEFAULT 'tiles'");
+  addColumnIfMissing("card_containers", "description TEXT NOT NULL DEFAULT ''");
   db.exec(
     `CREATE TABLE IF NOT EXISTS card_containers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -129,6 +132,6 @@ try {
   // ignore
 }
 
-await ensureBootstrapAdmin(db);
+runAuthGateMigration(db);
 
 console.log("Migrations complete.");

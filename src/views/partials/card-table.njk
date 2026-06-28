@@ -21,7 +21,7 @@
 <a href="#inv-{{ row_id }}" class="title-edit-link" @click.prevent="invOpenId = (String(invOpenId) === '{{ row_id }}' ? null : '{{ row_id }}')">{{ caller() }}</a>
 {%- endmacro %}
 
-{# Shared grid for table card edit, new card, and gallery card forms. Pass url_default / image_default for new rows only (e.g. gallery). #}
+{# Shared grid for table card edit, new card, and gallery card forms. #}
 {% macro card_form_fields(card, is_new, tag_selected, url_default, image_default, site, current_section, all_card_containers) %}
   <div class="card-edit-grid">
     {% if is_new %}
@@ -35,7 +35,7 @@
       <label class="card-edit-label">{{ site.card_label_title }}<br /><input type="text" name="title" required placeholder="{{ site.card_placeholder_title }}" autocomplete="off" /></label>
     </p>
     <p class="card-edit-field card-edit-field-desc">
-      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="4" placeholder="{{ site.card_placeholder_description }}"></textarea></label>
+      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="3" placeholder="{{ site.card_placeholder_description }}"></textarea></label>
     </p>
     <p class="card-edit-field card-edit-field-url">
       <label class="card-edit-label">{{ site.card_label_url }}<br /><input type="text" name="url" value="{% if url_default %}{{ url_default }}{% else %}#{% endif %}" /></label>
@@ -45,6 +45,9 @@
     </p>
     <p class="card-edit-field card-edit-field-image">
       <label class="card-edit-label">{{ site.card_label_image_url }}<br /><input type="text" name="image_url" value="{{ image_default }}" placeholder="{{ site.card_placeholder_image_url }}" /></label>
+    </p>
+    <p class="card-edit-field" style="grid-column:1">
+      <label class="card-edit-label">Icon (emoji)<br /><input type="text" name="icon" placeholder="e.g. ☁ ▶ 🔧" style="width:8rem" /></label>
     </p>
     <p class="card-edit-field card-edit-field-sort">
       <label class="card-edit-label">Sort order<br /><input type="number" name="sort_order" placeholder="Auto" /></label>
@@ -60,7 +63,7 @@
       <label class="card-edit-label">{{ site.card_label_title }}<br /><input type="text" name="title" value="{{ card.title }}" required /></label>
     </p>
     <p class="card-edit-field card-edit-field-desc">
-      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="4">{{ card.description }}</textarea></label>
+      <label class="card-edit-label">{{ site.card_label_description }}<br /><textarea name="description" rows="3">{{ card.description }}</textarea></label>
     </p>
     <p class="card-edit-field card-edit-field-url">
       <label class="card-edit-label">{{ site.card_label_url }}<br /><input type="text" name="url" value="{{ card.url }}" /></label>
@@ -71,6 +74,9 @@
     <p class="card-edit-field card-edit-field-image">
       <label class="card-edit-label">{{ site.card_label_image_url }}<br /><input type="text" name="image_url" value="{{ card.image_url }}" /></label>
     </p>
+    <p class="card-edit-field" style="grid-column:1">
+      <label class="card-edit-label">Icon (emoji)<br /><input type="text" name="icon" value="{{ card.icon }}" placeholder="e.g. ☁ ▶ 🔧" style="width:8rem" /></label>
+    </p>
     <p class="card-edit-field card-edit-field-sort">
       <label class="card-edit-label">Sort order<br /><input type="number" name="sort_order" value="{{ card.sort_order }}" /></label>
     </p>
@@ -78,23 +84,24 @@
   </div>
 {% endmacro %}
 
-{# layout: tiles | rail | gallery. Optional new-card defaults for gallery-style sections. #}
-{% macro card_table(dom_id, heading_text, cards, section_key, session, table_modifier, default_new_tag, wrapper, heading_tag, site, all_card_containers, layout, new_card_url_default, new_card_image_default) %}
+{# layout: tiles | rail | gallery. section_description: optional note shown below section heading. #}
+{% macro card_table(dom_id, heading_text, cards, section_key, session, table_modifier, default_new_tag, wrapper, heading_tag, site, all_card_containers, layout, new_card_url_default, new_card_image_default, section_description, dbg_num) %}
 {% set layout = layout or 'tiles' %}
+{% set alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] %}
 {% set new_card_url_default = new_card_url_default or '' %}
 {% set new_card_image_default = new_card_image_default or '' %}
 {% set wrap = wrapper or 'section' %}
-{% set htag = heading_tag or 'h2' %}
 {% set has_containers = (all_card_containers and all_card_containers.length > 0) %}
 {% if wrap == 'section' %}
-<section id="{{ dom_id }}" aria-labelledby="{{ dom_id }}-heading">
+<section id="{{ dom_id }}" {% if heading_text %}aria-labelledby="{{ dom_id }}-heading"{% endif %}>
 {% else %}
 <div id="{{ dom_id }}">
 {% endif %}
-  {% if htag == 'h3' %}
-  <h3 id="{{ dom_id }}-heading">{{ heading_text }}</h3>
-  {% else %}
-  <h2 id="{{ dom_id }}-heading">{{ heading_text }}</h2>
+  {% if heading_text %}
+  <div class="section-label" id="{{ dom_id }}-heading">{% if dbg_num %}<span class="dbg" x-show="debugMode" style="display:none">{{ dbg_num }}</span>{% endif %}// {{ heading_text }}</div>
+  {% endif %}
+  {% if section_description %}
+  <div class="container-note">{{ section_description }}</div>
   {% endif %}
   {% if layout == 'gallery' %}
   <div class="page-grid">
@@ -103,9 +110,10 @@
       <div id="card-{{ card.id }}" class="gallery-item gallery-item--admin">
         <img class="gallery-thumb" src="{{ card.image_url }}" alt="{{ card.title }}" />
         <div class="gallery-meta">
+          {% if dbg_num %}<span class="dbg" x-show="debugMode" style="display:none">{{ dbg_num }}{{ alpha[loop.index0] }}</span>{% endif %}
           <p class="gallery-title">{{ card.title }}</p>
           <p class="gallery-subtitle">{{ card.description | e | truncate(160) }}</p>
-          <p class="card-tile-footer">
+          <p class="card-tile-footer" x-show="editMode" style="display:none">
             <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
           </p>
         </div>
@@ -114,6 +122,7 @@
       <a class="gallery-item" href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>
         <img class="gallery-thumb" src="{{ card.image_url }}" alt="{{ card.title }}" />
         <div class="gallery-meta">
+          {% if dbg_num %}<span class="dbg" x-show="debugMode" style="display:none">{{ dbg_num }}{{ alpha[loop.index0] }}</span>{% endif %}
           <p class="gallery-title">{{ card.title }}</p>
           <p class="gallery-subtitle">{{ card.description | e | truncate(160) }}</p>
         </div>
@@ -130,9 +139,10 @@
     <div class="card-tile-grid{% if table_modifier %} {{ table_modifier }}{% endif %}">
       {% for card in cards %}
       <article id="card-{{ card.id }}" class="card-tile">
+        {% if dbg_num %}<span class="dbg dbg-card" x-show="debugMode" style="display:none">{{ dbg_num }}{{ alpha[loop.index0] }}</span>{% endif %}
         <p class="card-tile-top">
           {% if session and session.role == "admin" %}
-          <a href="#card-{{ card.id }}" class="card-tile-title title-edit-link" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ card.title }}</a>
+          <a href="{{ card.url }}" class="card-tile-title title-edit-link" @click="if(editMode){ $event.preventDefault(); openCardEditor('{{ section_key }}', '{{ card.id }}') }">{{ card.title }}</a>
           {% else %}
           <a href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} class="card-tile-title">{{ card.title }}</a>
           {% endif %}
@@ -141,7 +151,7 @@
         <p class="card-desc">{{ card.description | e | truncate(180) }}</p>
         <p class="mono card-url">{{ card.url }}</p>
         {% if session and session.role == "admin" %}
-        <p class="card-tile-footer">
+        <p class="card-tile-footer" x-show="editMode" style="display:none">
           <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
         </p>
         {% endif %}
@@ -150,25 +160,35 @@
     </div>
   </div>
   {% else %}
+  {# tiles layout — ORI card structure #}
   <div class="card-tile-grid{% if table_modifier %} {{ table_modifier }}{% endif %}">
     {% for card in cards %}
+    {% if session and session.role == "admin" %}
     <article id="card-{{ card.id }}" class="card-tile">
-      <p class="card-tile-top">
-        {% if session and session.role == "admin" %}
-        <a href="#card-{{ card.id }}" class="card-tile-title title-edit-link" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ card.title }}</a>
-        {% else %}
-        <a href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} class="card-tile-title">{{ card.title }}</a>
-        {% endif %}
-        <span class="tag {{ card.tag }}">{{ card.tag | upper }}</span>
-      </p>
-      <p class="card-desc">{{ card.description | e | truncate(180) }}</p>
-      <p class="mono card-url">{{ card.url }}</p>
-      {% if session and session.role == "admin" %}
-      <p class="card-tile-footer">
+      {% if dbg_num %}<span class="dbg dbg-card" x-show="debugMode" style="display:none">{{ dbg_num }}{{ alpha[loop.index0] }}</span>{% endif %}
+      {% if card.icon %}<div class="card-icon">{{ card.icon }}</div>{% endif %}
+      <div class="card-title">
+        <span class="status-dot"></span>
+        <a href="{{ card.url }}" class="title-edit-link" @click="if(editMode){ $event.preventDefault(); openCardEditor('{{ section_key }}', '{{ card.id }}') }">{{ card.title }}</a>
+      </div>
+      {% if card.description %}<div class="card-sub">{{ card.description | e | truncate(120) }}</div>{% endif %}
+      {% if card.url and card.url != '#' %}<span class="card-badge">{{ card.url | truncate(40, true, '…') }}</span>{% endif %}
+      <p class="card-tile-footer" x-show="editMode" style="display:none">
         <button type="button" class="action-btn action-btn--edit" @click.prevent="openCardEditor('{{ section_key }}', '{{ card.id }}')">{{ site.card_action_edit }}</button>
       </p>
-      {% endif %}
     </article>
+    {% else %}
+    <a id="card-{{ card.id }}" class="card-tile" href="{{ card.url }}"{% if card.open_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>
+      {% if dbg_num %}<span class="dbg dbg-card" x-show="debugMode" style="display:none">{{ dbg_num }}{{ alpha[loop.index0] }}</span>{% endif %}
+      {% if card.icon %}<div class="card-icon">{{ card.icon }}</div>{% endif %}
+      <div class="card-title">
+        <span class="status-dot"></span>
+        {{ card.title }}
+      </div>
+      {% if card.description %}<div class="card-sub">{{ card.description | e | truncate(120) }}</div>{% endif %}
+      {% if card.url and card.url != '#' %}<span class="card-badge">{{ card.url | truncate(40, true, '…') }}</span>{% endif %}
+    </a>
+    {% endif %}
     {% endfor %}
   </div>
   {% endif %}
@@ -176,7 +196,7 @@
   {% for card in cards %}
   <div
     class="card-modal-backdrop"
-    x-show="isCardEditorOpen('{{ section_key }}', '{{ card.id }}')"
+    x-show="editMode && isCardEditorOpen('{{ section_key }}', '{{ card.id }}')"
     style="display:none;"
     @keydown.escape.window="closeCardEditors()"
     @click.self="closeCardEditors()"
@@ -201,7 +221,7 @@
   {% endif %}
   {% if session and session.role == "admin" %}
   {% if has_containers %}
-  <div class="card-new-wrap" x-show="isNewCardOpen('{{ section_key }}')" style="display:none;">
+  <div class="card-new-wrap" x-show="editMode && isNewCardOpen('{{ section_key }}')" style="display:none;">
     <form method="post" action="/admin/cards" class="card-inline-form">
       {{ card_form_fields(null, true, default_new_tag, new_card_url_default, new_card_image_default, site, section_key, all_card_containers) }}
       <p class="card-edit-toolbar">
@@ -214,14 +234,14 @@
       </p>
     </form>
   </div>
-  <p class="card-table-footer">
+  <p class="card-table-footer" x-show="editMode" style="display:none">
     <button type="button" class="action-btn action-btn--add" @click.prevent="openNewCard('{{ section_key }}')">{{ site.card_action_add }}</button>
   </p>
   {% else %}
-  <p class="card-table-footer">
+  <p class="card-table-footer" x-show="editMode" style="display:none">
     <button type="button" class="action-btn action-btn--add" disabled title="Create a card container first">{{ site.card_action_add }}</button>
   </p>
-  <p class="page-admin-lead">No card containers are configured. Add one in Card containers at the bottom of the page (admin) before creating cards.</p>
+  <p class="page-admin-lead" x-show="editMode" style="display:none">No card containers are configured. Add one in Card containers at the bottom of the page (admin) before creating cards.</p>
   {% endif %}
   {% endif %}
 {% if wrap == 'section' %}

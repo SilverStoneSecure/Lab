@@ -8,7 +8,13 @@
 {% endmacro %}
 
 {% block content %}
+{% set alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] %}
 <div x-data="{
+  debugMode: false,
+  editMode: localStorage.getItem('editMode') === 'true',
+  init() {
+    this.$watch('editMode', v => localStorage.setItem('editMode', String(v)));
+  },
   activeCardSection: null,
   activeCardId: null,
   activeNewSection: null,
@@ -47,120 +53,138 @@
     this.activeNewSection = null;
   }
 }">
-  <div class="bg-grid" aria-hidden="true"></div>
-  <div class="glow" aria-hidden="true"></div>
+
+  {# ── ORI Sticky Nav ── #}
+  <nav>
+    <span class="dbg" x-show="debugMode" style="display:none">1</span>
+    <a class="nav-logo" href="/">
+      <span class="dbg" x-show="debugMode" style="display:none">1a</span>
+      <span class="nav-logo-mark">◈</span>
+      <span class="nav-logo-name">{{ site.brand_title or 'SILVERSTONE' }}</span>
+    </a>
+    <ul class="nav-links">
+      {% for container in cardContainers %}
+      <li><span class="dbg" x-show="debugMode" style="display:none">1{{ alpha[loop.index0 + 1] }}</span><a href="#{{ container.section_key }}">{{ container.title }}</a></li>
+      {% endfor %}
+      <li><span class="dbg" x-show="debugMode" style="display:none">1{{ alpha[cardContainers | length + 1] }}</span><a href="#inventory">{{ site.nav_label_inventory }}</a></li>
+      {% if session and session.role == "admin" %}
+      <li>
+        <div class="mode-pill-group">
+          <div class="mode-toggles">
+            <button type="button" class="action-btn dbg-toggle" :class="{'dbg-on': debugMode}" @click="debugMode = !debugMode">
+              <span x-text="debugMode ? 'DEBUGGING ●' : 'DEBUG'">DEBUG</span>
+            </button>
+            <button type="button" class="action-btn edit-toggle" :class="{'edit-on': editMode}" @click="editMode = !editMode">
+              <span x-text="editMode ? 'EDITING ●' : 'EDIT'">EDIT</span>
+            </button>
+          </div>
+          <span class="mode-marker">Admin Mode</span>
+        </div>
+      </li>
+      {% endif %}
+      <li>
+        <span class="dbg" x-show="debugMode" style="display:none">1{{ alpha[cardContainers | length + 3] }}</span>
+        {% if session %}
+        <span class="nav-auth-user">{{ session.username }}</span>
+        {% endif %}
+      </li>
+      <li>
+        {% if session %}
+        <form method="get" action="/portal/logout" style="display:inline"><button type="submit" class="action-btn action-btn--logout">{{ site.status_logout or 'Logout' }}</button></form>
+        {% else %}
+        <a href="/portal/login" class="action-btn action-btn--login">{{ site.nav_label_login or 'Login' }}</a>
+        {% endif %}
+      </li>
+      <li><a href="https://silverstonesecure.com" style="font-size:0.73rem;color:#5a5a5a;letter-spacing:0.06em;text-decoration:none;border:1px solid #2a2a2a;border-radius:2px;padding:0.22rem 0.6rem;white-space:nowrap;">← sss.com</a></li>
+    </ul>
+  </nav>
+
+  {# ── Hero ── #}
+  <div class="hero">
+    <span class="dbg" x-show="debugMode" style="display:none">2</span>
+    <div style="font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#5a5a5a;margin-bottom:0.5rem;">[ private — lab ]</div>
+    <div class="hero-title"><span class="dbg" x-show="debugMode" style="display:none">2a</span>{{ site.brand_title or 'SILVERSTONE' }}</div>
+    <p class="hero-sub"><span class="dbg" x-show="debugMode" style="display:none">2b</span>{{ site.brand_subtitle | safe }}</p>
+    {% if session and session.role == "admin" %}
+    <div id="snippet-brand_title" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="max-width:32rem;margin:1rem auto 0;text-align:left;display:none">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_snippet_anchor" value="brand_title" />
+        <label class="doc-snippet-label" for="hdr-brand_title">brand_title</label>
+        <input id="hdr-brand_title" type="text" name="brand_title" value="{{ site.brand_title }}" autocomplete="off" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    {% endif %}
+    <div class="scan-line"></div>
+  </div>
 
   <div class="wrap">
-  <header>
-    <div class="brand">
-      <div class="brand-top">
-        <span class="brand-badge">{{ site.brand_badge }}</span>
-        <span class="header-auth">
-          {% if session %}
-          <span class="header-auth-user">{{ site.status_signed_in_as }} {{ session.username }}</span>
-          <form method="post" action="/logout" style="display:inline"><button type="submit" class="action-btn action-btn--logout">{{ site.status_logout }}</button></form>
-          {% else %}
-          <a href="/login" class="action-btn action-btn--login">{{ site.nav_label_login }}</a>
-          {% endif %}
-        </span>
-      </div>
-      <h1>{{ site.brand_title }}</h1>
-      {% if session and session.role == "admin" %}
-      <div id="snippet-brand_title" class="doc-snippet-admin doc-snippet-admin--hero" tabindex="-1">
-        <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
-          <input type="hidden" name="_snippet_anchor" value="brand_title" />
-          <label class="doc-snippet-label" for="hdr-brand_title">brand_title</label>
-          <input id="hdr-brand_title" type="text" name="brand_title" value="{{ site.brand_title }}" autocomplete="off" />
-          <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+
+  {# ── Quick-access strip ── #}
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <a href="https://aio.silverstonesecure.com" style="font-size:0.73rem;text-decoration:none;color:#d4d4d4;background:#161616;border:1px solid #2a2a2a;border-radius:3px;padding:0.3rem 0.8rem;letter-spacing:0.04em;">🔒 Private AIO</a>
+    <a href="https://ae.silverstonesecure.com" style="font-size:0.73rem;text-decoration:none;color:#d4d4d4;background:#161616;border:1px solid #2a2a2a;border-radius:3px;padding:0.3rem 0.8rem;letter-spacing:0.04em;">Acme Electric →</a>
+    <a href="https://je.silverstonesecure.com" style="font-size:0.73rem;text-decoration:none;color:#d4d4d4;background:#161616;border:1px solid #2a2a2a;border-radius:3px;padding:0.3rem 0.8rem;letter-spacing:0.04em;">Jules Electric →</a>
+  </div>
+
+  {# ── Status overview (admin admin block) ── #}
+  {% if session and session.role == "admin" %}
+  <div class="section-label"><span class="dbg" x-show="debugMode" style="display:none">3</span>// status</div>
+  <div class="card-tile overview-card">
+    <p class="status-wan"><span class="dbg" x-show="debugMode" style="display:none">3a</span><strong>{{ site.status_label_wan }}</strong> {{ site.status_wan }}</p>
+    <p class="status-host"><span class="dbg" x-show="debugMode" style="display:none">3b</span><strong>{{ site.status_host }}</strong></p>
+    {% if statusLines.length %}
+    <ul class="status-list">
+      {% for line in statusLines %}
+      <li><span class="dbg" x-show="debugMode" style="display:none">3{{ alpha[loop.index0 + 2] }}</span>{{ line.body | safe }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <div id="snippet-status_label_wan" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="display:none">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_snippet_anchor" value="status_label_wan" />
+        <label class="doc-snippet-label" for="ov-status_label_wan">status_label_wan</label>
+        <input id="ov-status_label_wan" type="text" name="status_label_wan" value="{{ site.status_label_wan }}" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    <div id="snippet-status_wan" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="display:none">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_snippet_anchor" value="status_wan" />
+        <label class="doc-snippet-label" for="ov-status_wan">status_wan</label>
+        <input id="ov-status_wan" type="text" name="status_wan" value="{{ site.status_wan }}" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    <div id="snippet-status_host" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="display:none">
+      <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
+        <input type="hidden" name="_snippet_anchor" value="status_host" />
+        <label class="doc-snippet-label" for="ov-status_host">status_host</label>
+        <input id="ov-status_host" type="text" name="status_host" value="{{ site.status_host }}" />
+        <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
+      </form>
+    </div>
+    <div class="overview-ports-admin" x-show="editMode" style="display:none">
+      {% for line in statusLines %}
+      <div class="overview-port-row">
+        <form method="post" action="/admin/status-lines/{{ line.id }}" class="card-inline-form overview-port-form">
+          <input name="body" value="{{ line.body }}" />
+          <button type="submit" class="action-btn action-btn--save">{{ site.status_action_save_line }}</button>
+        </form>
+        <form method="post" action="/admin/status-lines/{{ line.id }}/delete" class="card-inline-form" onsubmit="return confirm('{{ site.status_confirm_delete_line }}');">
+          <button type="submit" class="action-btn action-btn--delete">{{ site.status_action_delete_line }}</button>
         </form>
       </div>
-      {% endif %}
-      <p class="subtitle">
-        {{ site.brand_subtitle | safe }}
-      </p>
-      <nav class="quick-nav" aria-label="Site navigation">
-        <a href="/">{{ site.nav_label_home }}</a>
-        <a href="#devices">{{ site.nav_label_devices }}</a>
-        <a href="#internal">{{ site.nav_label_internal }}</a>
-        <a href="#inventory">{{ site.nav_label_inventory }}</a>
-        <a href="#external">{{ site.nav_label_external }}</a>
-        <a href="#about">{{ site.nav_label_about }}</a>
-        <a href="#contact">{{ site.nav_label_contact }}</a>
-        <a href="#media_folder">{{ site.nav_label_media }}</a>
-        <div class="dropdown">
-          <button class="dropbtn nav-pill" type="button" aria-haspopup="true">{{ site.nav_label_categories }}</button>
-          <div class="dropdown-content">
-            <a href="#devices">{{ site.nav_label_devices }}</a>
-            <a href="#contact">{{ site.nav_label_contact }}</a>
-            <a href="#about">{{ site.nav_label_about }}</a>
-            <a href="#media_folder">{{ site.nav_label_media }}</a>
-            <a href="/public/images/backgrounds/">{{ site.nav_label_images_backgrounds }}</a>
-            <a href="/public/images/icons/">{{ site.nav_label_images_icons }}</a>
-          </div>
-        </div>
-      </nav>
-      {% if session and session.role == "admin" %}
-      <p class="quick-nav-admin-link">
-        <a href="#card-containers-manager" class="nav-pill">Card container manager</a>
-      </p>
-      {% endif %}
-      <div class="overview-card card-tile">
-        <p class="status-wan"><strong>{{ site.status_label_wan }}</strong> {{ site.status_wan }}</p>
-        <p class="status-host"><strong>{{ site.status_host }}</strong></p>
-        {% if statusLines.length %}
-        <ul class="status-list">
-          {% for line in statusLines %}
-          <li>{{ line.body | safe }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-        {% if session and session.role == "admin" %}
-        <div id="snippet-status_label_wan" class="doc-snippet-admin" tabindex="-1">
-          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
-            <input type="hidden" name="_snippet_anchor" value="status_label_wan" />
-            <label class="doc-snippet-label" for="ov-status_label_wan">status_label_wan</label>
-            <input id="ov-status_label_wan" type="text" name="status_label_wan" value="{{ site.status_label_wan }}" />
-            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
-          </form>
-        </div>
-        <div id="snippet-status_wan" class="doc-snippet-admin" tabindex="-1">
-          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
-            <input type="hidden" name="_snippet_anchor" value="status_wan" />
-            <label class="doc-snippet-label" for="ov-status_wan">status_wan</label>
-            <input id="ov-status_wan" type="text" name="status_wan" value="{{ site.status_wan }}" />
-            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
-          </form>
-        </div>
-        <div id="snippet-status_host" class="doc-snippet-admin" tabindex="-1">
-          <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
-            <input type="hidden" name="_snippet_anchor" value="status_host" />
-            <label class="doc-snippet-label" for="ov-status_host">status_host</label>
-            <input id="ov-status_host" type="text" name="status_host" value="{{ site.status_host }}" />
-            <button type="submit" class="action-btn action-btn--save">{{ site.page_admin_action_save }}</button>
-          </form>
-        </div>
-        <div class="overview-ports-admin">
-          {% for line in statusLines %}
-          <div class="overview-port-row">
-            <form method="post" action="/admin/status-lines/{{ line.id }}" class="card-inline-form overview-port-form">
-              <input name="body" value="{{ line.body }}" />
-              <button type="submit" class="action-btn action-btn--save">{{ site.status_action_save_line }}</button>
-            </form>
-            <form method="post" action="/admin/status-lines/{{ line.id }}/delete" class="card-inline-form" onsubmit="return confirm('{{ site.status_confirm_delete_line }}');">
-              <button type="submit" class="action-btn action-btn--delete">{{ site.status_action_delete_line }}</button>
-            </form>
-          </div>
-          {% endfor %}
-          <form method="post" action="/admin/status-lines" class="card-inline-form overview-port-add">
-            <input name="body" placeholder="{{ site.page_admin_status_new_placeholder }}" />
-            <button type="submit" class="action-btn action-btn--add">{{ site.status_action_add_line }}</button>
-          </form>
-        </div>
-        {% endif %}
-      </div>
+      {% endfor %}
+      <form method="post" action="/admin/status-lines" class="card-inline-form overview-port-add">
+        <input name="body" placeholder="{{ site.page_admin_status_new_placeholder }}" />
+        <button type="submit" class="action-btn action-btn--add">{{ site.status_action_add_line }}</button>
+      </form>
     </div>
-  </header>
+  </div>
+  {% endif %}
 
+  {# ── Card containers ── #}
   {% for container in cardContainers %}
   {% if container.section_key == 'external' %}
   {% set default_tag = 'wan' %}
@@ -185,14 +209,17 @@
   {% set url_def = '' %}
   {% set img_def = '' %}
   {% endif %}
-  {{ card_table(container.section_key, container.title, (cardsBySection[container.section_key] or []), container.section_key, session, table_mod, default_tag, 'section', 'h2', site, allCardContainers, container.layout, url_def, img_def) }}
+  {{ card_table(container.section_key, container.title, (cardsBySection[container.section_key] or []), container.section_key, session, table_mod, default_tag, 'section', 'h2', site, allCardContainers, container.layout, url_def, img_def, container.description, loop.index + 3) }}
   {% endfor %}
+  {% set inv_num = 4 + (cardContainers | length) %}
 
+  {# ── Inventory ── #}
   <section id="inventory" aria-labelledby="inventory-heading">
-    <h2 id="inventory-heading">{{ site.heading_inventory }}</h2>
+    <div class="section-label" id="inventory-heading"><span class="dbg" x-show="debugMode" style="display:none">{{ inv_num }}</span>// {{ site.heading_inventory }}</div>
     <div class="card-tile-grid inventory-tile-grid">
       {% for row in inventory %}
       <article id="inv-{{ row.id }}" class="card-tile inventory-tile">
+        <span class="dbg dbg-card" x-show="debugMode" style="display:none">{{ inv_num }}{{ alpha[loop.index0] }}</span>
         <p class="card-tile-top">
           <span class="card-tile-title">
             {% if row.link %}<a href="{{ row.link }}" class="card-tile-title">{{ row.host }}</a>{% else %}{{ row.host }}{% endif %}
@@ -203,10 +230,10 @@
         <p class="inventory-meta mono">{{ site.inventory_col_ipv4 }}: {% if row.ipv4 %}{{ row.ipv4 }}{% else %}—{% endif %}</p>
         <p class="card-desc">{{ row.notes }}</p>
         {% if session and session.role == "admin" %}
-        <p class="card-tile-footer">
+        <p class="card-tile-footer" x-show="editMode" style="display:none">
           <button type="button" class="action-btn action-btn--edit" @click.prevent="invOpenId = (String(invOpenId) === '{{ row.id }}' ? null : '{{ row.id }}')">{{ site.inventory_action_edit }}</button>
         </p>
-        <div class="card-inline-panel" x-show="String(invOpenId) === '{{ row.id }}'" style="display:none;" x-bind:style="String(invOpenId) === '{{ row.id }}' ? 'display:block' : ''">
+        <div class="card-inline-panel" x-show="editMode && String(invOpenId) === '{{ row.id }}'" style="display:none;" x-bind:style="editMode && String(invOpenId) === '{{ row.id }}' ? 'display:block' : ''">
           <form method="post" action="/admin/inventory/{{ row.id }}" class="card-inline-form">
             <div class="inv-edit-grid">
               <p><label>{{ site.inventory_label_host }}<br /><input name="host" value="{{ row.host }}" required /></label></p>
@@ -231,7 +258,7 @@
       {% endfor %}
     </div>
     {% if session and session.role == "admin" %}
-    <div class="card-new-wrap" x-show="invOpenId === 'new'" style="display:none;" x-bind:style="invOpenId === 'new' ? 'display:block' : ''">
+    <div class="card-new-wrap" x-show="editMode && invOpenId === 'new'" style="display:none;" x-bind:style="editMode && invOpenId === 'new' ? 'display:block' : ''">
       <form method="post" action="/admin/inventory" class="card-inline-form">
         <div class="inv-edit-grid">
           <p><label>{{ site.inventory_label_host }}<br /><input name="host" value="{{ site.inventory_new_host_default }}" required /></label></p>
@@ -248,16 +275,17 @@
         </p>
       </form>
     </div>
-    <p class="card-table-footer">
+    <p class="card-table-footer" x-show="editMode" style="display:none">
       <button type="button" class="action-btn action-btn--add" @click.prevent="invOpenId = (invOpenId === 'new' ? null : 'new')">{{ site.inventory_action_add_row }}</button>
     </p>
     {% endif %}
   </section>
 
+  {# ── About / Notes ── #}
   <section id="about" aria-labelledby="about-heading">
-    <h2 id="about-heading">{{ site.heading_about }}</h2>
+    <div class="section-label" id="about-heading"><span class="dbg" x-show="debugMode" style="display:none">{{ inv_num + 1 }}</span>// {{ site.heading_about }}</div>
     {% if session and session.role == "admin" %}
-    <div id="snippet-heading_about" class="doc-snippet-admin" tabindex="-1">
+    <div id="snippet-heading_about" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="display:none">
       <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
         <input type="hidden" name="_next" value="about" />
         <label class="doc-snippet-label" for="about-in-heading">heading_about</label>
@@ -267,11 +295,9 @@
     </div>
     {% endif %}
     <div class="note">
-      <p style="margin: 0 0 0.7rem">
-        {{ site.about_p1 | safe }}
-      </p>
+      <p style="margin: 0 0 0.7rem">{{ site.about_p1 | safe }}</p>
       {% if session and session.role == "admin" %}
-      <div id="snippet-about_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+      <div id="snippet-about_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1" x-show="editMode" style="display:none">
         <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
           <input type="hidden" name="_next" value="about" />
           <label class="doc-snippet-label" for="about-in-p1">about_p1</label>
@@ -280,11 +306,9 @@
         </form>
       </div>
       {% endif %}
-      <p style="margin: 0">
-        {{ site.about_p2 | safe }}
-      </p>
+      <p style="margin: 0">{{ site.about_p2 | safe }}</p>
       {% if session and session.role == "admin" %}
-      <div id="snippet-about_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+      <div id="snippet-about_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1" x-show="editMode" style="display:none">
         <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
           <input type="hidden" name="_next" value="about" />
           <label class="doc-snippet-label" for="about-in-p2">about_p2</label>
@@ -297,9 +321,9 @@
   </section>
 
   <section id="info" aria-labelledby="info-heading">
-    <h2 id="info-heading">{{ site.heading_notes }}</h2>
+    <div class="section-label" id="info-heading"><span class="dbg" x-show="debugMode" style="display:none">{{ inv_num + 2 }}</span>// {{ site.heading_notes }}</div>
     {% if session and session.role == "admin" %}
-    <div id="snippet-heading_notes" class="doc-snippet-admin" tabindex="-1">
+    <div id="snippet-heading_notes" class="doc-snippet-admin" tabindex="-1" x-show="editMode" style="display:none">
       <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
         <input type="hidden" name="_next" value="info" />
         <label class="doc-snippet-label" for="notes-in-heading">heading_notes</label>
@@ -309,11 +333,9 @@
     </div>
     {% endif %}
     <div class="note">
-      <p style="margin: 0 0 0.75rem">
-        {{ site.notes_p1 | safe }}
-      </p>
+      <p style="margin: 0 0 0.75rem">{{ site.notes_p1 | safe }}</p>
       {% if session and session.role == "admin" %}
-      <div id="snippet-notes_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+      <div id="snippet-notes_p1" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1" x-show="editMode" style="display:none">
         <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
           <input type="hidden" name="_next" value="info" />
           <label class="doc-snippet-label" for="notes-in-p1">notes_p1</label>
@@ -322,11 +344,9 @@
         </form>
       </div>
       {% endif %}
-      <p style="margin: 0">
-        {{ site.notes_p2 | safe }}
-      </p>
+      <p style="margin: 0">{{ site.notes_p2 | safe }}</p>
       {% if session and session.role == "admin" %}
-      <div id="snippet-notes_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1">
+      <div id="snippet-notes_p2" class="doc-snippet-admin doc-snippet-admin--after" tabindex="-1" x-show="editMode" style="display:none">
         <form method="post" action="/admin/site-snippets" class="doc-snippet-form">
           <input type="hidden" name="_next" value="info" />
           <label class="doc-snippet-label" for="notes-in-p2">notes_p2</label>
@@ -339,17 +359,17 @@
   </section>
 
   {% if session and session.role == "admin" %}
-  {% include "partials/page-admin.njk" %}
+  <div x-show="editMode" style="display:none">
+    {% include "partials/page-admin.njk" %}
+  </div>
   {% endif %}
 
   <footer>
-    <p class="footer-line">
-      {{ site.footer_line1 }}
-    </p>
-    <p class="footer-line">
-      {{ site.footer_line2 | safe }}
-    </p>
+    {{ site.footer_line1 }}
+    &nbsp;·&nbsp;
+    {{ site.footer_line2 | safe }}
   </footer>
-  </div>
-</div>
+
+  </div>{# end .wrap #}
+</div>{# end x-data #}
 {% endblock %}

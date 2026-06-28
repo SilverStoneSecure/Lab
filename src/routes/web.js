@@ -1,5 +1,4 @@
-import { clearSession, readSession, setSession } from "../auth/session.js";
-import { verifyPassword } from "../auth/password.js";
+import { readClientSession, authGateGuard } from "../auth/auth-gate.js";
 import { loadSiteSnippets, loadStatusLines } from "../db/siteContent.js";
 
 function bySection(db, section) {
@@ -14,9 +13,41 @@ function loadCardContainers(db, onlyShown) {
 }
 
 export async function registerWebRoutes(fastify) {
-  fastify.get("/", async (request, reply) => {
-    const session = readSession(request);
+  fastify.get("/template", async (request, reply) => {
+    const rawSession = authGateGuard(request, reply);
+    if (!rawSession) return;
     const db = fastify.db;
+    const userRow = db
+      .prepare("SELECT username, role FROM client_users WHERE id = ? AND archived_at IS NULL")
+      .get(rawSession.userId);
+    if (!userRow) {
+      const { clearClientSession } = await import("../auth/auth-gate.js");
+      clearClientSession(reply);
+      return reply.redirect("/portal/login");
+    }
+    const session = { id: rawSession.userId, username: userRow.username, role: userRow.role };
+    return reply.view("pages/template.njk", {
+      session,
+      site: loadSiteSnippets(db)
+    });
+  });
+
+  fastify.get("/", async (request, reply) => {
+    const rawSession = authGateGuard(request, reply);
+    if (!rawSession) return;
+
+    const db = fastify.db;
+    const userRow = db
+      .prepare("SELECT username, role FROM client_users WHERE id = ? AND archived_at IS NULL")
+      .get(rawSession.userId);
+    if (!userRow) {
+      const { clearClientSession } = await import("../auth/auth-gate.js");
+      clearClientSession(reply);
+      return reply.redirect("/portal/login");
+    }
+
+    const session = { id: rawSession.userId, username: userRow.username, role: userRow.role };
+
     const cardContainers = loadCardContainers(db, true);
     const cardsBySection = {};
     for (const container of cardContainers) {
@@ -32,33 +63,5 @@ export async function registerWebRoutes(fastify) {
       allCardContainers: loadCardContainers(db, false),
       inventory: db.prepare("SELECT * FROM inventory_rows ORDER BY sort_order, id").all()
     });
-  });
-
-  fastify.get("/login", async (_request, reply) => {
-    return reply.view("pages/login.njk", { error: null, site: loadSiteSnippets(fastify.db) });
-  });
-
-  fastify.post("/login", async (request, reply) => {
-    const { username, password } = request.body || {};
-    const site = loadSiteSnippets(fastify.db);
-    const user = fastify.db.prepare("SELECT * FROM users WHERE username = ?").get(username);
-    if (!user) return reply.view("pages/login.njk", { error: site.auth_invalid_credentials, site });
-
-    let ok = false;
-    try {
-      ok = await verifyPassword(user.password_hash, password);
-    } catch {
-      // Treat malformed/legacy hashes as invalid credentials for the UI.
-      ok = false;
-    }
-    if (!ok) return reply.view("pages/login.njk", { error: site.auth_invalid_credentials, site });
-
-    setSession(reply, user);
-    return reply.redirect("/");
-  });
-
-  fastify.post("/logout", async (_request, reply) => {
-    clearSession(reply);
-    return reply.redirect("/");
   });
 }

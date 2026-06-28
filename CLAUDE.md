@@ -147,6 +147,22 @@ env/            # .env.example, .env.postgres.example, .env.mariadb.example
 
 ---
 
+## Design Reference
+
+> *Visual/UX inspiration to pull from when iterating the UI.*
+
+**`reference/silverstonesecure-landing-ref.html`** — Chad's static landing page artifact.
+Features Chad liked (pick from when styling):
+
+- **Glow system** — `--g1/g2/g3-green/cyan/amber` CSS vars: inner blur + outer bloom at a fixed 2.6× ratio. More refined than the current card shadows.
+- **Per-category pop engine** — cards set `--pop-scale`, `--pop-lift`, `--pop-glow` as CSS custom properties; a single `:hover` rule inherits all three. WAN pops more than LAN.
+- **Animated pulse dots** — `service-dot` / `status-dot` with a 2.4s ease-in-out infinite pulse (opacity 1 → 0.45). Same dot reused in the status bar and on card titles.
+- **Node info grid** — 3-column `node-card` tiles with `node-row` key/value rows and a colored title border per category (green/cyan/amber). Good pattern for a hardware/stack summary block.
+- **Link cards** — `link-card` with a left-to-right `linear-gradient` overlay that fades in on hover. Cleaner than plain border-color hover.
+- **Section labels** — `::before { content: '// ' }` in CSS, no inline markup needed.
+
+---
+
 ## TODO / Ideas
 
 > *Running list of "things I'd like Claude's help with later."*

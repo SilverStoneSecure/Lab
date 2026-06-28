@@ -1,4 +1,4 @@
-import { readSession } from "../auth/session.js";
+import { requireAdmin } from "../auth/auth-gate.js";
 import { SNIPPET_KEYS } from "../db/siteContent.js";
 
 const ALLOWED_TAGS = new Set(["lan", "wan", "service", "device", "folder", "template"]);
@@ -13,15 +13,6 @@ function normalizeTag(raw) {
 function normalizeLayout(raw) {
   const v = String(raw || "tiles").toLowerCase();
   return ALLOWED_LAYOUTS.has(v) ? v : "tiles";
-}
-
-function requireAdmin(request, reply) {
-  const session = readSession(request);
-  if (!session || session.role !== "admin") {
-    reply.code(403).send({ error: "Admin only" });
-    return null;
-  }
-  return session;
 }
 
 function truthyCheckbox(v) {
@@ -61,7 +52,6 @@ function nextContainerSectionKey(db, baseKey) {
   return `${base}_${Date.now()}`;
 }
 
-/** After POST /admin/site-snippets, send user back to the block they edited. */
 function siteSnippetsRedirectTarget(body) {
   const next = String(body?._next ?? "").trim();
   if (next === "about") return "/#about";
@@ -104,14 +94,14 @@ export async function registerAdminRoutes(fastify) {
 
   fastify.post("/admin/cards", async (request, reply) => {
     if (!requireAdmin(request, reply)) return;
-    const { section, title, description, url, tag, image_url } = request.body || {};
+    const { section, title, description, url, tag, image_url, icon } = request.body || {};
     const openNew = truthyCheckbox(request.body?.open_new_tab) ? 1 : 0;
     const sec = resolveCardSection(fastify.db, section, "internal");
     const maxRow = fastify.db.prepare("SELECT COALESCE(MAX(sort_order), 0) AS m FROM cards WHERE section = ?").get(sec);
     const sortOrder = toInt(request.body?.sort_order, (maxRow?.m ?? 0) + 1);
     fastify.db
       .prepare(
-        "INSERT INTO cards (section, title, description, url, tag, sort_order, image_url, open_new_tab) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO cards (section, title, description, url, tag, icon, sort_order, image_url, open_new_tab) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
       )
       .run(
         sec,
@@ -119,6 +109,7 @@ export async function registerAdminRoutes(fastify) {
         description || "",
         url || "#",
         normalizeTag(tag),
+        icon || "",
         sortOrder,
         image_url || "",
         openNew
@@ -129,14 +120,14 @@ export async function registerAdminRoutes(fastify) {
   fastify.post("/admin/cards/:id", async (request, reply) => {
     if (!requireAdmin(request, reply)) return;
     const { id } = request.params;
-    const { section, title, description, url, tag, image_url } = request.body || {};
+    const { section, title, description, url, tag, image_url, icon } = request.body || {};
     const openNew = truthyCheckbox(request.body?.open_new_tab) ? 1 : 0;
     const existing = fastify.db.prepare("SELECT section FROM cards WHERE id = ?").get(id);
     const sec = resolveCardSection(fastify.db, section, existing?.section || "internal");
     const sortOrder = toInt(request.body?.sort_order, 0);
     fastify.db
       .prepare(
-        "UPDATE cards SET section=?, title=?, description=?, url=?, tag=?, sort_order=?, image_url=?, open_new_tab=?, updated_at=CURRENT_TIMESTAMP WHERE id=?"
+        "UPDATE cards SET section=?, title=?, description=?, url=?, tag=?, icon=?, sort_order=?, image_url=?, open_new_tab=?, updated_at=CURRENT_TIMESTAMP WHERE id=?"
       )
       .run(
         sec,
@@ -144,6 +135,7 @@ export async function registerAdminRoutes(fastify) {
         description || "",
         url || "#",
         normalizeTag(tag),
+        icon || "",
         sortOrder,
         image_url || "",
         openNew,
@@ -161,7 +153,7 @@ export async function registerAdminRoutes(fastify) {
 
   fastify.post("/admin/card-containers", async (request, reply) => {
     if (!requireAdmin(request, reply)) return;
-    const { section_key, title, category } = request.body || {};
+    const { section_key, title, category, description } = request.body || {};
     const row = fastify.db
       .prepare("SELECT COALESCE(MAX(display_order), 0) AS m FROM card_containers")
       .get();
@@ -174,24 +166,24 @@ export async function registerAdminRoutes(fastify) {
 
     fastify.db
       .prepare(
-        "INSERT INTO card_containers (section_key, title, category, layout, display_order, is_shown) VALUES (?, ?, ?, ?, ?, ?)"
+        "INSERT INTO card_containers (section_key, title, category, layout, description, display_order, is_shown) VALUES (?, ?, ?, ?, ?, ?, ?)"
       )
-      .run(key, String(title || key), String(category || "general"), layout, displayOrder, isShown);
+      .run(key, String(title || key), String(category || "general"), layout, description || "", displayOrder, isShown);
     return reply.redirect("/#card-containers-manager");
   });
 
   fastify.post("/admin/card-containers/:id", async (request, reply) => {
     if (!requireAdmin(request, reply)) return;
     const { id } = request.params;
-    const { title, category } = request.body || {};
+    const { title, category, description } = request.body || {};
     const displayOrder = toInt(request.body?.display_order, 0);
     const isShown = truthyCheckbox(request.body?.is_shown) ? 1 : 0;
     const layout = normalizeLayout(request.body?.layout);
     fastify.db
       .prepare(
-        "UPDATE card_containers SET title=?, category=?, layout=?, display_order=?, is_shown=?, updated_at=CURRENT_TIMESTAMP WHERE id=?"
+        "UPDATE card_containers SET title=?, category=?, layout=?, description=?, display_order=?, is_shown=?, updated_at=CURRENT_TIMESTAMP WHERE id=?"
       )
-      .run(String(title || "Untitled"), String(category || "general"), layout, displayOrder, isShown, id);
+      .run(String(title || "Untitled"), String(category || "general"), layout, description || "", displayOrder, isShown, id);
     return reply.redirect("/#card-containers-manager");
   });
 
@@ -200,7 +192,7 @@ export async function registerAdminRoutes(fastify) {
     const { id } = request.params;
     const current = fastify.db
       .prepare(
-        "SELECT section_key, title, category, layout, display_order, is_shown FROM card_containers WHERE id = ?"
+        "SELECT section_key, title, category, layout, description, display_order, is_shown FROM card_containers WHERE id = ?"
       )
       .get(id);
     if (!current) return reply.redirect("/#card-containers-manager");
@@ -210,13 +202,14 @@ export async function registerAdminRoutes(fastify) {
     const layout = normalizeLayout(current.layout);
     fastify.db
       .prepare(
-        "INSERT INTO card_containers (section_key, title, category, layout, display_order, is_shown) VALUES (?, ?, ?, ?, ?, ?)"
+        "INSERT INTO card_containers (section_key, title, category, layout, description, display_order, is_shown) VALUES (?, ?, ?, ?, ?, ?, ?)"
       )
       .run(
         sectionKey,
         title,
         String(current.category || "general"),
         layout,
+        current.description || "",
         Number(current.display_order || 0) + 1,
         current.is_shown ? 1 : 0
       );
