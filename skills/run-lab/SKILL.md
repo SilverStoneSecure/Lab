@@ -30,8 +30,9 @@ The SQLite DB at `./data/app.db` must have been seeded. If starting fresh:
 ```bash
 npm run migrate
 npm run seed:lab
-npm run create-admin -- admin Admin123!pass
 ```
+
+Then register the first admin manually via `POST /portal/register` (first registrant becomes admin) — no CLI tool exists for this anymore.
 
 ## Run (agent path — smoke driver)
 
@@ -87,8 +88,7 @@ kill %1
 ## Gotchas
 
 - **Port 3000 is Rocket.Chat** on this host. `EADDRINUSE` on port 3000 = use 3099 (or any free port). Always pass `PORT=` explicitly.
-- **`ALLOW_DEFAULT_ADMIN=1` is not needed in development** — `NODE_ENV=development` makes the seed admin (`admin / Admin123!pass`) available automatically via `ensureBootstrapAdmin`.
-- **Passwords with `!` in npm args need single quotes:** `npm run create-admin -- admin 'Admin123!pass'`. In env files or scripts, no quoting issue.
+- **No env-var admin bootstrap exists** — admin is granted to whoever registers first via `/portal/register`.
 - **Cookie jar is stateful.** If a previous test left a session in `/tmp/lab-c.txt`, later tests will appear authenticated. The smoke driver always starts with `rm -f $COOKIES`.
 - **WAL mode:** `data/app.db` uses WAL (`app.db-shm`, `app.db-wal`). Do not delete only the main file — delete all three or none.
 

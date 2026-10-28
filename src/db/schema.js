@@ -1,13 +1,4 @@
 export const migrationSql = `
-CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK(role IN ('admin', 'viewer')),
-  must_change_password INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS card_containers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   section_key TEXT NOT NULL UNIQUE,

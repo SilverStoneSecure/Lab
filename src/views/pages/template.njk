@@ -1,0 +1,45 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+<div class="ss-page">
+
+  <header class="ss-header">
+    <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+      <svg style="height:38px;width:auto;" viewBox="0 0 230 270" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="sc"><path d="M 30,29 Q 68,24 115,15 Q 162,24 200,29 L 200,145 Q 200,212 115,247 Q 30,212 30,145 Z"/></clipPath>
+          <path id="sa" d="M 35,70 A 128.3,128.3 0 0 1 195,70"/>
+        </defs>
+        <path d="M 25,25 Q 65,20 115,10 Q 165,20 205,25 L 205,145 Q 205,215 115,252 Q 25,215 25,145 Z" fill="#111111"/>
+        <path d="M 25,25 Q 65,20 115,10 Q 165,20 205,25 L 205,145 Q 205,215 115,252 Q 25,215 25,145 Z" fill="none" stroke="#f2f2f2" stroke-width="2.5"/>
+        <path d="M 30,29 Q 68,24 115,15 Q 162,24 200,29 L 200,145 Q 200,212 115,247 Q 30,212 30,145 Z" fill="none" stroke="#ff6a13" stroke-width="1" stroke-dasharray="4,3" opacity="0.75"/>
+        <text font-family="Futura, 'Century Gothic', sans-serif" font-size="25" font-weight="bold" textLength="155" lengthAdjust="spacing">
+          <textPath href="#sa" startOffset="50%" text-anchor="middle"><tspan fill="#ff6a13">SilverStone</tspan></textPath>
+        </text>
+        <line x1="0" y1="167" x2="230" y2="167" stroke="#f2f2f2" stroke-width="1" clip-path="url(#sc)"/>
+        <text x="115" y="182" text-anchor="middle" font-family="Futura, 'Century Gothic', sans-serif" font-size="13" font-weight="bold" textLength="148" lengthAdjust="spacing">
+          <tspan fill="#ff6a13">Secure</tspan><tspan fill="#f2f2f2">.com</tspan>
+        </text>
+      </svg>
+      <span class="ss-brand">{{ site.brand_title or 'SilverStone' }}</span>
+    </a>
+
+    <nav class="ss-menu">
+      <a href="#" class="ss-menu-item active">Home</a>
+      <a href="#" class="ss-menu-item">Services</a>
+      <a href="#" class="ss-menu-item">Contact</a>
+    </nav>
+  </header>
+
+  <main class="ss-content">
+    <h1 class="ss-h1">Page Title</h1>
+    <p class="ss-body">Page content goes here.</p>
+  </main>
+
+  <footer class="ss-footer">
+    <span class="ss-footer-copy">© 2026 SilverStone</span>
+    <span class="ss-footer-copy">Powered by SilverStone</span>
+  </footer>
+
+</div>
+{% endblock %}

@@ -38,9 +38,9 @@ Editable cards use a tag dropdown: **LAN**, **WAN**, **Service**, **Device**, **
 3. Run migrations and seed:
    - `npm run migrate`
    - `npm run seed` (empty DB only) **or** `npm run seed:lab` anytime to reset cards + inventory to the Lab snapshot
-4. First admin user (pick one):
-   - **Default (development):** after `migrate` or first `npm start`, if `users` is empty the app creates **`admin` / `Admin123!pass`** (same as the hints on `/login`). In `NODE_ENV=production`, set **`ALLOW_DEFAULT_ADMIN=1`** once for that behavior, or use the command below instead.
-   - **Explicit:** `npm run create-admin -- admin YourPasswordHere` (or `npm run reset-admin-password -- admin NewPassword` if the user already exists).
+4. First admin user:
+   - Register at `/portal/register` — the **first** account registered is automatically promoted to admin (`client_users.role`); subsequent registrations are plain `client` users, capped at 10.
+   - There is currently no CLI recovery tool. To reset admin access if locked out, edit `client_users.role` directly in `data/app.db` via `sqlite3`.
 5. Start:
    - `npm run dev`
 6. Open:
@@ -74,8 +74,8 @@ NPM equivalents: `npm run docker:build`, `docker:start`, `docker:stop`, `docker:
    - `docker compose up --build`
 3. First time only (optional): seed — set `RUN_SEED_ON_START=1` in `.env` for one boot, or run `docker compose exec app npm run seed` / `docker compose exec app npm run seed:lab` to reload the Lab card + inventory snapshot
 4. Create or fix admin inside container:
-   - New user: `docker compose exec app npm run create-admin -- admin 'YourPassword'` (use **single quotes** if the password contains `!` or `$`)
-   - User already exists / “invalid” login: `docker compose exec app npm run reset-admin-password -- admin 'YourPassword'`
+   - New user: register at `/portal/register` — first account becomes admin automatically.
+   - Locked out: `docker compose exec app sqlite3 data/app.db "UPDATE client_users SET role='admin' WHERE username='<user>';"`
 5. Open:
    - `http://localhost:3000` (or `http://<server-ip>:3000`)
 

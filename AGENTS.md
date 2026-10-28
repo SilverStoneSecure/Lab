@@ -9,7 +9,7 @@ This document orients coding agents and contributors to **portable-lab-template*
 - **Views:** Nunjucks under `src/views/` (`layouts/`, `pages/`, `partials/`).
 - **Static files:** `src/public/` — HTTP prefix **`/public/`** (see `src/server.js`).
 - **Database:** `better-sqlite3`, WAL mode; path from `SQLITE_PATH` (default `./data/app.db`). **`DB_CLIENT` must be `sqlite`** — other values throw until adapters exist (`src/db/client.js`).
-- **Auth:** Argon2 password hashes; signed cookie **`lab_session`** (`src/auth/session.js`). Admin routes return **403 JSON** when not admin (`src/routes/admin.js`).
+- **Auth:** Argon2 password hashes via `/portal/*` routes (`src/routes/auth-gate.js`, `src/auth/auth-gate.js`); signed cookie **`client_session`**. First user to register becomes admin (`client_users.role`). Admin routes return **403 JSON** when not admin (`src/routes/admin.js`).
 
 There is **no** ESLint, Prettier, or automated test script in `package.json`; validate changes by running the app and exercising flows manually.
 
@@ -29,7 +29,6 @@ There is **no** ESLint, Prettier, or automated test script in `package.json`; va
 | `src/public/styles.css` | Primary stylesheet (Lab-derived + admin extras). |
 | `scripts/migrate.js` | Runs schema + incremental SQLite alterations/backfills; calls `ensureBootstrapAdmin`. |
 | `scripts/seed.js`, `scripts/seed-lab.js` | Populate or reset card/inventory data. |
-| `scripts/create-admin.js`, `scripts/reset-admin-password.js` | User management CLI. |
 | `docker/docker-compose.yml`, `docker/Dockerfile`, `docker/docker-entrypoint.sh` | Container build and optional migrate/seed on start. |
 | `reference/` | Reference HTML (`README.md` in repo root describes diffing vs Lab). |
 
@@ -45,8 +44,6 @@ Human-oriented setup and feature lists live in **`README.md`**.
 | `npm run migrate` | Apply DB schema and migrations. |
 | `npm run seed` | Seed cards + inventory **only if** tables are empty. |
 | `npm run seed:lab` | Replace **cards + inventory** with Lab snapshot (users unchanged). |
-| `npm run create-admin -- <user> <password>` | Create admin user. |
-| `npm run reset-admin-password -- <user> <password>` | Reset password. |
 | `npm run check-env` | Pre-flight for Docker tooling (`scripts/check-env.sh`). |
 | `npm run docker:build` / `docker:start` / `docker:stop` / `docker:status` | Shell wrappers around Compose. |
 
@@ -58,8 +55,7 @@ See **`env/.env.example`** for the canonical list. Important for agents:
 
 - **`SESSION_SECRET`** — required for serious use; dev default in code is insecure.
 - **`SESSION_SECURE`** — `1` when served over HTTPS; `0` for plain HTTP (local/Docker).
-- **`NODE_ENV=production`** — default admin bootstrap is **disabled** unless **`ALLOW_DEFAULT_ADMIN=1`** (see `src/auth/bootstrapUser.js`). Prefer `create-admin` for production.
-- **`BOOTSTRAP_ADMIN_USERNAME` / `BOOTSTRAP_ADMIN_PASSWORD`** — optional overrides when empty DB gets a default admin.
+- Admin is granted by registering first through `/portal/register` — there is no env-var-driven bootstrap admin. No CLI admin-recovery tool exists; recovery today means direct SQL against `client_users`.
 - **`RUN_MIGRATE_ON_START`**, **`RUN_SEED_ON_START`** — read by **`docker/docker-entrypoint.sh`** only, not by plain `npm start`.
 
 ## Patterns and conventions

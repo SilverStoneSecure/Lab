@@ -20,7 +20,7 @@ Context for Claude Code when working in this repo. Edit freely — add what save
 - **Server:** Fastify 5.x
 - **Templating:** Nunjucks via `@fastify/view`
 - **DB:** SQLite via `better-sqlite3` (Postgres/MariaDB planned)
-- **Auth:** Argon2 password hashing, signed cookie sessions via `@fastify/cookie`
+- **Auth:** Argon2 password hashing, signed `client_session` cookie via `/portal/*` routes (`src/auth/auth-gate.js`); first registrant becomes admin
 - **Container:** Docker / docker-compose
 
 ---
@@ -51,8 +51,6 @@ env/            # .env.example, .env.postgres.example, .env.mariadb.example
 | `npm run migrate` | Apply schema migrations |
 | `npm run seed` | Seed empty DB |
 | `npm run seed:lab` | Reset cards + inventory to Lab snapshot (users untouched) |
-| `npm run create-admin -- <user> <pass>` | Create admin user |
-| `npm run reset-admin-password -- <user> <pass>` | Reset admin password |
 | `npm run check-env` | Pre-build environment check |
 | `npm run docker:build` / `docker:start` / `docker:stop` / `docker:status` | Docker lifecycle |
 
@@ -90,7 +88,7 @@ env/            # .env.example, .env.postgres.example, .env.mariadb.example
 - Copy `env/.env.example` → `.env` (at repo root) for local dev
 - `DB_CLIENT=sqlite` + `SQLITE_PATH=./data/app.db` for default
 - `SESSION_SECURE=0` for HTTP, `1` when behind TLS
-- `ALLOW_DEFAULT_ADMIN=1` enables the default `admin / Admin123!pass` seed in production (dev does this automatically)
+- No env-var admin bootstrap — first user through `/portal/register` becomes admin
 
 ---
 

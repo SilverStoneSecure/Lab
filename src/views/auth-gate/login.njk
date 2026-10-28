@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in — SilverStoneLab</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1>◈ SilverStoneLab</h1>
+      {% if error %}
+      <div class="auth-error">{{ error }}</div>
+      {% endif %}
+      <form method="post" action="/portal/login">
+        <div class="auth-field">
+          <label for="username">Username</label>
+          <input id="username" type="text" name="username" required autocomplete="username" autofocus />
+        </div>
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="auth-submit">Sign in</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

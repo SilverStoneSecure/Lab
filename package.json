@@ -11,8 +11,6 @@
     "seed": "node scripts/seed.js",
     "seed:lab": "node scripts/seed-lab.js",
     "seed:test": "node scripts/seed-test-containers.js",
-    "create-admin": "node scripts/create-admin.js",
-    "reset-admin-password": "node scripts/reset-admin-password.js",
     "check-env": "bash scripts/check-env.sh",
     "docker:build": "bash scripts/build.sh",
     "docker:start": "bash scripts/start.sh",

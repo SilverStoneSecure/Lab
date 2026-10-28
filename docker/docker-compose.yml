@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     ports:
-      - "${PORT:-3000}:3000"
+      - "127.0.0.1:${PORT:-3000}:3000"
     env_file:
       - ../.env
     environment:
@@ -24,7 +24,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://127.0.0.1:3000/',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+          "require('http').get('http://127.0.0.1:3000/',(r)=>process.exit(r.statusCode<400?0:1)).on('error',()=>process.exit(1))",
         ]
       interval: 30s
       timeout: 5s
